@@ -734,6 +734,124 @@ button{pointer-events:auto;cursor:pointer;font-family:inherit;}
 .planet-panel-row:last-child{border-bottom:0;}
 .planet-panel-row b{color:#ffe38a;white-space:nowrap;}
 .planet-panel-empty{font-size:11px;color:#91adbb;line-height:1.4;}
+/* V0.0.3 (план 10 §4) — Летопись Воронии в панели планеты */
+.vr-chronicle{
+    border-color: #3c1e5c;
+    background: linear-gradient(180deg, rgba(60,30,90,.30) 0%, rgba(20,10,35,.15) 100%);
+    position: relative;
+    overflow: hidden;
+}
+.vr-chronicle::before{
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, #c084fc 35%, #c084fc 65%, transparent 100%);
+    opacity: 0.55;
+}
+.vr-chronicle-title{
+    color: #c084fc !important;
+    letter-spacing: 1.4px !important;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+}
+.vr-chronicle-title-mark{
+    font-family: 'JetBrains Mono', monospace;
+    color: #e0c8ff;
+    opacity: 0.7;
+    font-size: 13px;
+    font-weight: 900;
+}
+.vr-chronicle-title-sub{
+    font-size: 9px;
+    font-weight: 400;
+    color: #7f9aa8;
+    letter-spacing: 0.8px;
+    margin-left: auto;
+    opacity: 0.75;
+}
+.vr-chronicle-line{
+    display: flex;
+    gap: 9px;
+    padding: 6px 0;
+    align-items: flex-start;
+    border-bottom: 1px dashed rgba(192,132,252,0.12);
+}
+.vr-chronicle-line:last-of-type{ border-bottom: none; }
+.vr-chronicle-fig{
+    flex: 0 0 auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #7ec9e8;
+    opacity: 0.65;
+    letter-spacing: 0.5px;
+    padding-top: 2px;
+    min-width: 40px;
+}
+.vr-chronicle-text{
+    flex: 1;
+    min-width: 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #cdb8e8;
+    font-style: italic;
+}
+.vr-chronicle-unique{
+    margin-top: 8px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: rgba(255,218,71,0.06);
+    border: 1px solid rgba(255,218,71,0.3);
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: #ffe4a3;
+    display: flex;
+    gap: 7px;
+    align-items: flex-start;
+}
+.vr-chronicle-unique-ico{
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(255,218,71,0.8));
+}
+/* V0.0.3 (план 10 §4+) — Летопись v2: счётчик прогресса и локи */
+.vr-chronicle-progress{
+    font-size: 9px;
+    color: #7f9aa8;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: rgba(192,132,252,0.08);
+    border: 1px solid rgba(192,132,252,0.22);
+    margin-left: 6px;
+    font-weight: 700;
+}
+.vr-chronicle-progress-full{
+    color: var(--gr);
+    background: rgba(115,199,107,0.10);
+    border-color: rgba(115,199,107,0.35);
+}
+.vr-chronicle-line-locked .vr-chronicle-fig{
+    color: #566a78;
+    opacity: 0.45;
+}
+.vr-chronicle-locked-text{
+    color: #6b7782 !important;
+    font-style: normal !important;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.vr-chronicle-lock-ico{
+    font-size: 10px;
+    opacity: 0.7;
+    filter: grayscale(0.4);
+}
+.vr-chronicle-line-locked{
+    border-bottom-color: rgba(120,120,120,0.10) !important;
+}
 
 #game-utility-buttons.hidden{display:none!important;}
 .extract-planet{text-align:center;color:var(--cy);font-size:13px;font-weight:bold;letter-spacing:1px;margin:-4px 0 12px;}
@@ -1960,7 +2078,7 @@ body.modal-open #cell-info-bar { display: none !important; }
                 <div class="ac-ico">⚡</div>
                 <div class="ac-body">
                     <div class="ac-title" style="color:#4ddcff;">ПИТАНИЕ</div>
-                    <div class="ac-desc">+4 Эн/с за уровень. Все жилы планеты истощаются на 30% медленнее (50% при углублении).</div>
+                    <div class="ac-desc">+4 Эн/с за уровень. Все месторождения планеты истощаются на 30% медленнее (50% при углублении).</div>
                 </div>
             </button>
             <button class="anomaly-choice" data-type="resonance">
@@ -2129,7 +2247,7 @@ body.modal-open #cell-info-bar { display: none !important; }
                 ячейками, названными в честь математика Георгия Вороного. Ворония — это «страна Вороного»:
                 имя мира и есть математика, из которой он собран.</span>
                 <br><br>
-                <span style="color:#6b7782;">v0.0.2 · прогресс и премиум-коды прежних циклов переносятся автоматически</span>
+                <span style="color:#6b7782;">v0.0.4 · прогресс и премиум-коды прежних циклов переносятся автоматически</span>
             </div>
         </div>
 
@@ -2203,7 +2321,7 @@ body.modal-open #cell-info-bar { display: none !important; }
             <button id="reset-btn">НОВАЯ ИГРА</button>
             <button id="title-share-btn">📤 Поделиться сейвом</button>
             <div id="title-status"></div>
-            <div id="title-version">v0.0.2</div>
+            <div id="title-version">v0.0.4</div>
         </div>
         <div id="title-voronoi-tag">fig. 1 — разбиение Вороного · <span id="title-voronoi-seeds">34</span> семени<br><span>так устроена каждая планета Воронии</span></div>
     </div>
@@ -2238,7 +2356,7 @@ body.modal-open #cell-info-bar { display: none !important; }
 </div>
 
 <script>
-const GAME_VERSION = '0.0.2';
+const GAME_VERSION = '0.0.4';
 const SAVE_SCHEMA_VERSION = 31;   // V0.0.4.44 — ячейки исследований (type 6); V0.0.4.43 — Босс v2; V0.0.4.42 — смешанная геометрия
 
 (()=>{'use strict';
@@ -2533,7 +2651,7 @@ function renderResearch(){
         </div>`;
     }).join('');
     document.getElementById('research-val').textContent = Math.floor(research);
-    document.getElementById('research-rate').textContent = researchPerSec().toFixed(3);
+    document.getElementById('research-rate').textContent = fmtRate(researchPerSec());   // V0.0.3 — VR-12: единый формат с игровым циклом
 }
 document.getElementById('research-list').addEventListener('click', (e)=>{
     const btn = e.target.closest('.r-buy');
@@ -2591,7 +2709,7 @@ const DUST_PERKS = {
         { id:'rare1',         name:'Катализатор извлечения',desc:'+20% ко всем редким ресурсам',      cost:25 },
         { id:'rare2',         name:'Квантовое обогащение', desc:'+35% ко всем редким (заменяет I)',    cost:80, req:['rare1'] },
         { id:'crystal1',      name:'Огранка',              desc:'+25% к добыче кристаллов',            cost:35 },
-        { id:'depletion_slow',name:'Стабилизаторы',        desc:'−15% к скорости истощения жил',       cost:40 },
+        { id:'depletion_slow',name:'Стабилизаторы',        desc:'−15% к скорости истощения месторождений', cost:40 },
         { id:'anomaly_power', name:'Усилитель питания',    desc:'+30% к Эн/с от аномалий «Питание»',   cost:60 },
         { id:'anomaly_reson', name:'Резонансный фильтр',   desc:'+50% к 💎/с от аномалий «Резонанс»',  cost:70 },
     ],
@@ -2612,7 +2730,7 @@ const DUST_PERKS = {
         { id:'offline_speed',   name:'Ускоренные сны',        desc:'+25% к офлайн-добыче',                        cost:30,  req:['offline_eff'] },
         { id:'auto_anomaly',    name:'🧬 Авто-аномалия',     desc:'Авто-сканер сам выбирает тип аномалии (синтез → питание → резонанс)', cost:120, req:['auto_scan'] },
         { id:'auto_deep',       name:'⚡ Авто-углубление',   desc:'Авто-апгрейд сам углубляет аномалии до 5 ур.',  cost:180, req:['auto_upgrade'] },
-        { id:'auto_react_batch',name:'📦 Пакетная реактивация',desc:'Реактивирует ВСЕ истощённые жилы всех планет за такт', cost:90, req:['auto_react'] },
+        { id:'auto_react_batch',name:'📦 Пакетная реактивация',desc:'Реактивирует ВСЕ истощённые месторождения всех планет за такт', cost:90, req:['auto_react'] },
         { id:'fleet_cap1',      name:'Расширенный трюм',    desc:'+100% к базовой вместимости корабля',           cost:35 },
         { id:'fleet_spd1',      name:'Форсажные двигатели', desc:'+50% к скорости транспорта',                    cost:45, req:['fleet_cap1'] },
         { id:'fleet_ship',      name:'Второй корабль',      desc:'+1 к максимуму кораблей',                       cost:80, req:['fleet_cap1'] },
@@ -2791,6 +2909,46 @@ let screenShake=0;
 let particles=[];
 let crashLanding={active:false,progress:1};
 
+// ============================================================
+// V0.0.3 (план 10 §5) — ВОЛНА ОТКРЫТИЯ МИРА
+// Играет при первом визите на новую планету: три расходящихся
+// кольца + радиальные искры. Не персистится — эффект одноразовый.
+// ============================================================
+let discoveryWave = {
+    active: false,
+    t0: 0,
+    duration: 1.6,
+    color: '#7ee7ff',
+    sparks: []
+};
+
+function fireDiscoveryWave(color){
+    // Не перебиваем волну, если она уже играет — просто красим в новый цвет
+    if(discoveryWave.active && performance.now() - discoveryWave.t0 < discoveryWave.duration * 1000 * 0.5){
+        discoveryWave.color = color || discoveryWave.color;
+        return;
+    }
+    discoveryWave.active = true;
+    discoveryWave.t0 = performance.now();
+    discoveryWave.duration = 1.6;
+    discoveryWave.color = color || (activePlanet && activePlanet.palette && activePlanet.palette.border) || '#7ee7ff';
+    // 24 искры, разлетающиеся радиально с небольшим разбросом
+    discoveryWave.sparks = [];
+    const n = 24;
+    for(let i = 0; i < n; i++){
+        discoveryWave.sparks.push({
+            angle: (i / n) * Math.PI * 2 + (Math.random() - 0.5) * 0.18,
+            speed: 0.55 + Math.random() * 0.65,   // множитель к базовой скорости
+            offset: Math.random() * 0.15,          // задержка старта искры
+            size: 1.1 + Math.random() * 2.0,
+            alpha: 0.45 + Math.random() * 0.5
+        });
+    }
+    addShake(8);
+    vibrate(20);
+    try{ SFX.discovery && SFX.discovery(); }catch(e){}
+}
+
 function addShake(amount){
     screenShake=Math.min(30,screenShake+Math.max(0,Number(amount)||0));
 }
@@ -2851,6 +3009,11 @@ let research=0, researchTotal=0;
 let tutorialStage=0;
 let tutorialCompleted=false;
 let onbWarehouseSeen=false;   // V0.0.2 — игрок хоть раз открывал Склад (персистится в сейве)
+// V0.0.3 (план 10 §4+) — глубина постижения для Летописи Воронии.
+// Считается как «престижи + метапрестижи×3» и хранит МАКСИМУМ за всё
+// время — чтобы после метапрестижа (который обнуляет totalPrestiges)
+// уже открытые фрагменты лора не исчезали.
+let loreMaxInsight = 0;
 
 // === РЕЕСТР РЕСУРСОВ (V20) ===
 const RESOURCES = {
@@ -3197,7 +3360,7 @@ const EVENT_TYPES = [
     { id:'acid_rain',
       name:'☣ Кислотный дождь',
       duration:60,
-      desc:'×3 к скорости истощения жил — месторождения иссякают втрое быстрее',
+      desc:'×3 к скорости истощения месторождений — они иссякают втрое быстрее',
       effects:{ depletionMult:3.0 } },
 
     { id:'gas_cloud',
@@ -3812,7 +3975,7 @@ function upgradeAnomaly(c,hitX,hitY){
                     const meta2 = ANOMALY_TYPES[at2];
                     const lvl2 = c.level||0;
                     let deepTxt = '';
-                    if(at2 === 'power')          deepTxt = `⚡ ×2 = ${4*(1+lvl2)*2} Эн/с · истощение жил −50%`;
+                    if(at2 === 'power')          deepTxt = `⚡ ×2 = ${4*(1+lvl2)*2} Эн/с · истощение месторождений −50%`;
                     else if(at2 === 'resonance') deepTxt = `💎 ×2 = ${(0.005*(1+lvl2)*2).toFixed(3)}/с`;
                     else                         deepTxt = `🌌 Синтез ×2 = ×${synthMult(c).toFixed(0)}`;
                     if(!quiet) spawnFloatingText(hitX,hitY,`${meta2.icon} ЯДРО ×2!`,meta2.color);
@@ -4015,6 +4178,7 @@ class Planet {
         this.verts=[];this.faces=[];this.cells=[];
         this.revealed=new Set();this.explored=new Set();
         this.startingCellId=-1;
+        this._visited=(id==='ferrum');   // V0.0.3 (план 10 §5) — Феррум считается посещённым со старта
         this._build();
     }
      _biomePerks(){
@@ -4340,6 +4504,7 @@ for(let i=0;i<n;i++){
             origin:this.origin||{},
             scanBonus:this.scanBonus||null,
             boss:this.boss||null,   // V0.0.4.41 — Волна 4
+            _visited: !!this._visited,             // V0.0.3 (план 10 §5) — был ли первый визит
             _mixed: !!this._mixed,                 // V0.0.4.42 — ПАТЧ 6: смешанная геометрия
             _schemaVersion: SAVE_SCHEMA_VERSION    // V0.0.4.42
         };
@@ -4432,6 +4597,11 @@ if(data.origin && typeof data.origin==='object') p.origin=data.origin; else p.or
         }
         if(!p.revealed.has(p.startingCellId)) p.revealed.add(p.startingCellId);
         if(!p.explored.has(p.startingCellId)) p.explored.add(p.startingCellId);
+        // V0.0.3 (план 10 §5) — восстановление флага первого визита.
+        // Феррум считается «уже посещённым»: игрок там и так был.
+        p._visited = (data._visited !== undefined)
+                     ? !!data._visited
+                     : (p.id === 'ferrum');
         // V0.0.4.37 — пересчёт флага уникальности по финальному seed
         p.isUnique = isUniqueWorld(p.seed, p.planetIndex);
         ensureCellColors(p);
@@ -4474,6 +4644,65 @@ function convexHullOnSphere(points, centroid){
     return lower.concat(upper);
 }
 
+// ============================================================
+// V0.0.3 (план 10 §3) — ХАРАКТЕР ФОРМЫ ПЛАНЕТЫ ПО КЛИМАТУ
+// Параметры слияния клеток задаются климатом, чтобы одна планета
+// выглядела как скопление ледниковых плит, другая — как россыпь
+// выжженных островков, третья — как рваная токсичная мозаика.
+// ============================================================
+function climateShapeParams(p){
+    const cid = (p && p.descriptors && p.descriptors.climate)
+              ? p.descriptors.climate.id : 'temperate';
+    switch(cid){
+        // Крупные слитые плиты (ледники, океаны лавы на полюсах)
+        case 'frozen':      return {
+            maxCluster: 14, joinDist: 0.78,
+            hotMin: 1, hotMax: 2,
+            rKeepMul: 1.35, rMergeMul: 1.25,
+            scoreNoise: 0.10
+        };
+        // Россыпь мелких островков (пепел, вулканическая крошка)
+        case 'scorched':    return {
+            maxCluster: 5, joinDist: 0.40,
+            hotMin: 3, hotMax: 5,
+            rKeepMul: 0.65, rMergeMul: 0.80,
+            scoreNoise: 0.28
+        };
+        // Рваные кластеры средней величины, «щупальца»
+        case 'toxic':       return {
+            maxCluster: 7, joinDist: 0.55,
+            hotMin: 3, hotMax: 5,
+            rKeepMul: 0.90, rMergeMul: 1.00,
+            scoreNoise: 0.22
+        };
+        // Крупные сегменты с резкими границами
+        case 'radioactive': return {
+            maxCluster: 10, joinDist: 0.66,
+            hotMin: 2, hotMax: 4,
+            rKeepMul: 1.10, rMergeMul: 1.15,
+            scoreNoise: 0.15
+        };
+        // Базовое слияние (умеренный)
+        case 'temperate':
+        default:            return {
+            maxCluster: 9, joinDist: 0.62,
+            hotMin: 2, hotMax: 4,
+            rKeepMul: 1.00, rMergeMul: 1.00,
+            scoreNoise: 0.20
+        };
+    }
+}
+// V0.0.3 (план 10 §3) — короткая подпись формы мира для панели планеты
+function climateShapeHint(cid){
+    switch(cid){
+        case 'frozen':      return 'ледниковые плиты';
+        case 'scorched':    return 'россыпь выжженных островков';
+        case 'toxic':       return 'рваная мозаика';
+        case 'radioactive': return 'крупные сегменты';
+        default:            return 'умеренное слияние';
+    }
+}
+
 function applyMixedGeometry(planet){
     if(!planet || planet._mixed) return false;                 // идемпотентно
     const idx = planet.planetIndex || 0;
@@ -4485,16 +4714,19 @@ function applyMixedGeometry(planet){
     const N = planet.cells.length;
     const oldCells = planet.cells;
 
-    // ---- 1. Hotspots: 2-4 зоны, где ячейки остаются мелкими ----
-    const nHot = 2 + Math.floor(rng() * 3);
+    // V0.0.3 (план 10 §3) — форма планеты задаётся климатом
+    const shape = climateShapeParams(planet);
+
+    // ---- 1. Hotspots ----
+    const nHot = shape.hotMin + Math.floor(rng() * (shape.hotMax - shape.hotMin + 1));
     const hotspots = [];
     for(let i = 0; i < nHot; i++){
         const th = rng() * Math.PI * 2;
         const ph = Math.acos(2 * rng() - 1);
         hotspots.push({
             dir: [Math.sin(ph)*Math.cos(th), Math.sin(ph)*Math.sin(th), Math.cos(ph)],
-            rKeep:  0.28 + rng() * 0.22,   // плотное ядро (без слияния)
-            rMerge: 0.75 + rng() * 0.55    // зона градиента
+            rKeep:  (0.28 + rng() * 0.22) * shape.rKeepMul,
+            rMerge: (0.75 + rng() * 0.55) * shape.rMergeMul
         });
     }
 
@@ -4516,14 +4748,15 @@ function applyMixedGeometry(planet){
             }
             if(s > best) best = s;
         }
-        score[i] = best + (rng() - 0.5) * 0.20;                 // «рваные» границы
+        score[i] = best + (rng() - 0.5) * shape.scoreNoise;      // «рваность» границ по климату
     }
 
     // ---- 3. Кластеризация ВНУТРИ групп одного типа ----
     //   (жилы type 3 группируются ещё и по resourceKey — углерод не
     //    смешивается с титаном; аномалии type 4 не сливаются вовсе)
-    const JOIN_MAX_DIST = 0.62;    // макс. угловой радиус кластера (~35°)
-    const MAX_CLUSTER   = 9;       // жёсткий кап размера кластера
+    // V0.0.3 (план 10 §3) — параметры зависят от климата планеты
+    const JOIN_MAX_DIST = shape.joinDist;
+    const MAX_CLUSTER   = shape.maxCluster;
     const clusterOf = new Int32Array(N).fill(-1);
     const groupKey = (c) => c.type === 4 ? 'a4_' + c.id : (c.type === 6 ? 'a6_' + c.id : (c.type === 3 ? 'r3_' + (c.resourceKey||'iron') : 't' + c.type));   // V0.0.4.44: аномалии и ячейки исследований не сливаются
     const byType = new Map();
@@ -4903,6 +5136,16 @@ GAME.setActivePlanet=function(id){
     syncStorageToActive();   // загрузить ресурсы новой планеты
     rotX=-.08;rotY=0;
     updateKriogenVisibility();updateUI();questEvent('travel',1);requestSave();draw();
+
+    // V0.0.3 (план 10 §5) — волна открытия мира при первом визите на планету.
+    // Задержка 700мс: гиперпрыжок (ccFlyToActivePlanet) играет 900мс;
+    // волна стартует в момент, когда flash уже на 78% — оба эффекта
+    // видны одновременно без того, чтобы один съел другой.
+    if(!activePlanet._visited){
+        activePlanet._visited = true;
+        const col = (activePlanet.palette && activePlanet.palette.border) || '#7ee7ff';
+        setTimeout(() => fireDiscoveryWave(col), 700);
+    }
     return true;
 };
 GAME.serializeGraph=function(){const g=GAME.PlanetaryGraph;return{version:g.version,nodes:g.nodes,edges:g.edges,hiddenUsed:Array.from(g.hiddenUsed)}}
@@ -5152,7 +5395,7 @@ function saveGame(){
 const data={version:SAVE_SCHEMA_VERSION,gameVersion:GAME_VERSION,timestamp:Date.now(),offlinePlanetId:activePlanetId,
     energy,iron,kriogen,crystals,dust,dustTotal,totalPrestiges,dustPerks,gameStartSeed,
     research,researchTotal,researchPerks,currentCost,tech,MAX_LEVEL,zoom,rotX,rotY,
-    tutorialStage,tutorialCompleted,onbWarehouseSeen,
+    tutorialStage,tutorialCompleted,onbWarehouseSeen,loreMaxInsight,
     activePlanetId,unlockedPlanets:Array.from(unlockedPlanets),sonarActivatedPlanets:Array.from(sonarActivatedPlanets),
     planets,planetaryGraph:GAME.serializeGraph(),devicePower,deviceScore,
     extraResources,extraResourcesPerSec,deliveries,dailyState,weekly,fleet,meteorBuffs,achievements:unlockedAchievements,achTiersClaimed,
@@ -5295,6 +5538,7 @@ function loadGame(){
         tutorialStage=Math.max(0,Math.min(6,Number(data.tutorialStage)||0));
         tutorialCompleted=!!data.tutorialCompleted;
         onbWarehouseSeen=!!data.onbWarehouseSeen;   // V0.0.2
+        loreMaxInsight=Math.max(0, Number(data.loreMaxInsight) || 0);   // V0.0.3 (план 10 §4+)
         if(Number(data.version||0) < 22){ tutorialStage=6; tutorialCompleted=true; }
         const st=data.tech||{};
         tech={costScale:Number(st.costScale)||0,ironBoost:Number(st.ironBoost)||0,maxLevel:Number(st.maxLevel)||0,crystalBoost:Number(st.crystalBoost)||0,kriogenBoost:Number(st.kriogenBoost)||0,therm:Number(st.therm)||0,hyperdrill:Number(st.hyperdrill)||0,recon:Number(st.recon)||0};
@@ -5508,6 +5752,99 @@ function planetShortDescription(p){
     const surface=d.surface?.name||'неизвестной поверхностью';
     const anomaly=d.anomaly?.name ? ` Аномалия: ${d.anomaly.name}.` : '';
     return `Процедурный мир с ${climate.toLowerCase()} климатом и ${surface.toLowerCase()} поверхностью.${anomaly}`;
+}
+
+// ============================================================
+// V0.0.3 (план 10 §4/§4+) — ЛЕТОПИСЬ ВОРОНИИ
+// Текстовый портрет планеты: базовый лор из seed + шёпот климата/
+// поверхности/аномалии + шёпот ядра. Фрагменты открываются по
+// глубине постижения: loreMaxInsight = престижи + метапрестижи×3
+// (максимум за всё время, переживает метапрестиж).
+// Прогрессия: fig.1 — всегда · fig.2 — 1 · fig.3 — 3 · fig.4 — 5 · fig.5 — 10.
+// ============================================================
+const CLIMATE_WHISPER = {
+    temperate:  'Здесь цикл раскола прошёл мягко — мир почти помнит себя целым.',
+    frozen:     'Лёд застыл прежде, чем Ворония успела расколоться. Здесь время идёт медленнее.',
+    scorched:   'Огонь первого цикла выжег всё живое. Осталась только порода и пепел.',
+    toxic:      'Воздух хранит дыхание древних. Он ядовит для нас, но помнит своего создателя.',
+    radioactive:'Ионизирующий фон — эхо ядерного распада Воронии. Ячейки пульсируют в такт.'
+};
+const SURFACE_WHISPER = {
+    rocky:   'Камень здесь — спрессованная память о том, что было до.',
+    oceanic: 'Океан скрывает то, что не смогло расколоться. Он солёный от слёз мира.',
+    desert:  'Пустыня — слой пепла, растянутый в бесконечность. Ничего не растёт.',
+    metallic:'Металл под ногами — обломки каркаса. Здесь когда-то была структура.',
+    crystal: 'Кристаллы растут сами. Они отражают свет звёзд, которых уже нет.'
+};
+const ANOMALY_WHISPER = {
+    resonant: 'Резонанс — это пульс ядра Воронии, всё ещё живого под корой.',
+    fractured:'Планета расколота изнутри. События здесь случаются сами, без причины.',
+    echoing:  'Всё здесь повторяется. Шаг — эхо. Слово — эхо. Мысль — эхо.'
+};
+const CORE_SECRETS = [
+    'В самом центре — маленькая трещина, из которой смотрит глаз.',
+    'Под корой — шестерня, всё ещё вращающаяся. Никто её не заводил.',
+    'Ядро нагрето чужими руками. Кто-то был здесь до нас.',
+    'Ты слышишь свой голос, произносящий слово, которое не знаешь.',
+    'Тишина здесь имеет форму. Она повторяет контур Воронии.',
+    'Здесь ячейки снятся друг другу. Одной из них снишься ты.',
+    'Карта этой планеты — точная копия карты Воронии. До раскола.',
+    'Каждый камень здесь — обломок одной-единственной клетки.',
+    'Мир помнит имя, которое ты ещё не произнёс. Оно — твоё.',
+    'Раскол не был случайным. Кто-то выбрал именно эту линию.'
+];
+function coreSecretFor(p){
+    if(!p) return null;
+    const rng = makeRNG(((p.seed>>>0) ^ 0x53454352) >>> 0);   // "SECR"
+    return CORE_SECRETS[Math.floor(rng() * CORE_SECRETS.length)];
+}
+
+const LORE_TIER_LABELS = {
+    base:      null,
+    climate:   '1 престиж',
+    surface:   '3 престижа',
+    anomaly:   '5 престижей',
+    core:      '10 престижей'
+};
+
+function chronicleFragments(p){
+    if(!p) return [];
+    const insight = loreMaxInsight | 0;
+    const out = [];
+
+    function push(text, requires, tier){
+        if(!text) return;
+        out.push({
+            text,
+            requires,
+            tier,
+            locked: insight < requires,
+            index: out.length
+        });
+    }
+
+    // fig. 1 — легендарная строка из seed (всегда)
+    push(p.lore || null, 0, 'base');
+
+    // fig. 2 — шёпот климата
+    const cid = p.descriptors && p.descriptors.climate && p.descriptors.climate.id;
+    if(cid && CLIMATE_WHISPER[cid])
+        push(CLIMATE_WHISPER[cid], 1, 'climate');
+
+    // fig. 3 — шёпот поверхности
+    const sid = p.descriptors && p.descriptors.surface && p.descriptors.surface.id;
+    if(sid && SURFACE_WHISPER[sid])
+        push(SURFACE_WHISPER[sid], 3, 'surface');
+
+    // fig. 4 — эхо аномалии (только если она есть)
+    const aid = p.descriptors && p.descriptors.anomaly && p.descriptors.anomaly.id;
+    if(aid && ANOMALY_WHISPER[aid])
+        push(ANOMALY_WHISPER[aid], 5, 'anomaly');
+
+    // fig. 5 — шёпот ядра (уникальная строка от seed планеты)
+    push(coreSecretFor(p), 10, 'core');
+
+    return out;
 }
 
 // === ПРОГРЕССИВНАЯ ЭКОНОМИКА АПГРЕЙДА КЛЕТОК v0.0.4.24 ===
@@ -5940,7 +6277,7 @@ function renderPlanetPanel(){
           const lockLeft = Math.max(0, (b.canReviveAt||0) - nowB);
           let hintTxt, btnDisabled;
           if(destroyedNow > 0){
-              hintTxt = `🔧 ${destroyedNow} ячеек разрушено`;
+              hintTxt = `🔧 ${destroyedNow} клеток разрушено`;
               btnDisabled = true;
           } else if(lockLeft > 0){
               const secB = Math.ceil(lockLeft/1000);
@@ -5957,7 +6294,7 @@ function renderPlanetPanel(){
       <div class="planet-panel-section">
         <h4>Характеристики</h4>
         <div class="planet-panel-row"><span>Исследовано</span><b>${explored}/${total} · ${scannedPct}%</b></div>
-        <div class="planet-panel-row"><span>Климат</span><span>${d.climate?.name||'—'}</span></div>
+        <div class="planet-panel-row"><span>Климат</span><span>${d.climate?.name||'—'} · <i style="color:#91adbb;font-style:normal;">${climateShapeHint(d.climate?.id)}</i></span></div>
         <div class="planet-panel-row"><span>Поверхность</span><span>${d.surface?.name||'—'}</span></div>
         <div class="planet-panel-row"><span>Геометрия</span><span>${p.geometryName} · F${p.f}</span></div>
         <div class="planet-panel-row"><span>Сектор</span><span>${sec?.name||'—'}</span></div>
@@ -6003,12 +6340,12 @@ function renderPlanetPanel(){
           return `
       <div class="planet-panel-section" style="border-color:#5a1c1c;background:rgba(60,10,10,.35);">
         <h4 style="color:#ffb0b0;">💀 РАЗРУШЕНО ХРАНИТЕЛЕМ</h4>
-        <div class="planet-panel-row"><span>Ячеек</span><b style="color:#ffb0b0">${destroyedCells.length}</b></div>
+        <div class="planet-panel-row"><span>Клеток</span><b style="color:#ffb0b0">${destroyedCells.length}</b></div>
         <div class="planet-panel-row"><span>Ближайшее восстановление</span><b>${mmD}:${ssD}</b></div>
         <div class="planet-panel-row"><span>Ускорить всё</span><b style="color:var(--am)">${fmtBig(totalE)} ⚡${totalC?' + '+totalC+' 💎':''}</b></div>
         <button class="menu-action-btn" id="planet-panel-restore-all" style="margin-top:6px;border-color:${canAllPaid?'#5cf2b0':'#5a1c1c'};color:${canAllPaid?'#5cf2b0':'#7a3a3a'};" ${canAllPaid?'':'disabled'}>
           <span>🔧 ВОССТАНОВИТЬ ВСЕ (ускорить)</span>
-          <span class="sub-text">${destroyedCells.length} ячеек</span>
+          <span class="sub-text">${destroyedCells.length} клеток</span>
         </button>
       </div>`;
       })()}
@@ -6049,7 +6386,60 @@ function renderPlanetPanel(){
       <div class="planet-panel-section">
         <h4>🧬 Особенности</h4>
         <div class="planet-panel-empty">${mods.length?mods.join(' · '):'Без специальных модификаторов'}${d.anomaly?.name?` · Аномалия: ${d.anomaly.name}`:''}</div>
+      </div>
+      ${(()=>{
+        // V0.0.3 (план 10 §4+) — ЛЕТОПИСЬ ВОРОНИИ v2: прогрессия фрагментов + локи
+        const frags = chronicleFragments(p);
+        if(!frags.length) return '';
+        const opened = frags.filter(f => !f.locked).length;
+        const total  = frags.length;
+        const insight = loreMaxInsight | 0;
+
+        const figLines = frags.map(f => {
+            const figNum = f.index + 1;
+            if(f.locked){
+                const need = Math.max(0, f.requires - insight);
+                return `
+                <div class="vr-chronicle-line vr-chronicle-line-locked">
+                    <span class="vr-chronicle-fig">fig. ${figNum}</span>
+                    <span class="vr-chronicle-text vr-chronicle-locked-text">
+                        <span class="vr-chronicle-lock-ico">🔒</span>
+                        Откроется после ${LORE_TIER_LABELS[f.tier] || (f.requires + ' престижей')}${need > 0 ? ` · осталось ${need}` : ''}
+                    </span>
+                </div>`;
+            }
+            return `
+            <div class="vr-chronicle-line">
+                <span class="vr-chronicle-fig">fig. ${figNum}</span>
+                <span class="vr-chronicle-text">${f.text}</span>
+            </div>`;
+        }).join('');
+
+        const uniqueBlock = p.isUnique ? `
+          <div class="vr-chronicle-unique">
+            <span class="vr-chronicle-unique-ico">🌟</span>
+            <span>Последний неразбитый осколок. Хранители помнят его другим — до раскола.</span>
+          </div>` : '';
+
+        // Счётчик прогресса: если всё открыто — не показываем «5/5», это шум.
+        const progressTag = (opened < total)
+            ? `<span class="vr-chronicle-progress">${opened}/${total}</span>`
+            : `<span class="vr-chronicle-progress vr-chronicle-progress-full">полная</span>`;
+
+        return `
+      <div class="planet-panel-section vr-chronicle">
+        <h4 class="vr-chronicle-title">
+          <span class="vr-chronicle-title-mark">§</span>
+          ЛЕТОПИСЬ ВОРОНИИ
+          <span class="vr-chronicle-title-sub">
+            ${p.planetIndex ? 'грани ' + String(p.planetIndex).padStart(2,'0') : ''}
+          </span>
+          ${progressTag}
+        </h4>
+        ${figLines}
+        ${uniqueBlock}
       </div>`;
+      })()}`;
     const sonar=document.getElementById('planet-panel-sonar');
     if(sonar)sonar.addEventListener('click',openSonarModal);
     const bossBtn=document.getElementById('planet-panel-boss');   // V0.0.4.41 — Волна 4
@@ -6418,6 +6808,24 @@ function hexToRgba(hex, alpha){
     const [r,g,b] = _hexRGB(hex);
     return `rgba(${r},${g},${b},${alpha})`;
 }
+// V0.0.3 (план 10 §1) — корректная rgba() для hex/hsl/rgb — в отличие от hexToRgba,
+// которая все три числа трактует как RGB и портит цвет у hsl-палитр.
+function colorWithAlpha(col, a){
+    if(!col) return `rgba(120,180,220,${a})`;
+    if(col[0] === '#'){
+        const [r,g,b] = _hexRGB(col);
+        return `rgba(${r},${g},${b},${a})`;
+    }
+    if(col.startsWith('rgb')){
+        const m = col.match(/[\d.]+/g);
+        if(m && m.length >= 3) return `rgba(${m[0]},${m[1]},${m[2]},${a})`;
+    }
+    if(col.startsWith('hsl')){
+        const m = col.match(/[\d.]+/g);
+        if(m && m.length >= 3) return `hsla(${m[0]},${m[1]}%,${m[2]}%,${a})`;
+    }
+    return `rgba(120,180,220,${a})`;
+}
 const CELL_RES_COLORS = (()=>{
     const m = {};
     for(const k in RESOURCES){
@@ -6453,6 +6861,95 @@ function ensureCellColors(p){
         c._colorVer = CELL_COLOR_VER;
     }
 }
+// ============================================================
+// V0.0.3 (план 10 §2) — ИМЯ ПЛАНЕТЫ НА СФЕРЕ
+// Не настоящий 3D-текст: буквы выкладываются по экранной дуге,
+// размер и яркость затухают к краям (имитация «обхвата» сферы).
+// ============================================================
+function drawPlanetName(pal){
+    if(!activePlanet || !activePlanet.name) return;
+    const name = String(activePlanet.name).toUpperCase();
+    const n = name.length;
+    if(n < 2) return;
+
+    const R = Math.min(W,H) * 0.36 * zoom;
+    const cx = W/2, cy = H/2;
+    // Дуга: центр на «полюсе» сферы, буквы идут влево-вправо от него
+    const arcCX = cx;
+    const arcCY = cy - R * 0.72;
+    const arcRadius = R * 0.62;
+    const spanHalf = Math.min(0.92, 0.075 * n + 0.15);   // полу-угол дуги (радианы)
+
+    // Размер шрифта: подгоняем так, чтобы при среднем n буквы влезали в дугу
+    const arcLenPx = arcRadius * spanHalf * 2;
+    const fontPx = Math.max(12, Math.min(30, arcLenPx / (n * 0.68)));
+
+    const tint = pal.border || '#8ddfff';
+    const nowSec = performance.now() / 1000;   // V0.0.4 — шиммер и «парение» букв
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    // Тонкая линия-подложка под именем (как «атмосферный след»)
+    ctx.beginPath();
+    ctx.arc(arcCX, arcCY, arcRadius, Math.PI/2 - spanHalf, Math.PI/2 + spanHalf);
+    ctx.strokeStyle = colorWithAlpha(tint, 0.16);
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // V0.0.4 — боковые засечки-«крылья» на концах дуги (антураж)
+    for(const sgn of [-1, 1]){
+        const th = Math.PI/2 + sgn * (spanHalf + 0.06);
+        const x1 = arcCX + Math.cos(th) * (arcRadius - 4);
+        const y1 = arcCY + Math.sin(th) * (arcRadius - 4);
+        const x2 = arcCX + Math.cos(th) * (arcRadius + 8 * zoom);
+        const y2 = arcCY + Math.sin(th) * (arcRadius + 8 * zoom);
+        ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+        ctx.strokeStyle = colorWithAlpha(tint, 0.38);
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+    }
+
+    for(let i = 0; i < n; i++){
+        const tParam = n === 1 ? 0.5 : i / (n - 1);
+        // V0.0.4 FIX: буквы слева направо. Раньше дуга шла в обратную сторону
+        // и имя читалось зеркально («9‑СОИРК» вместо «КРИОС‑9»): i=0 → левый край.
+        const theta = Math.PI/2 + spanHalf - tParam * spanHalf * 2;
+        const lx = arcCX + Math.cos(theta) * arcRadius;
+        // лёгкое «парение» букв в такт дыханию атмосферы
+        const ly = arcCY + Math.sin(theta) * arcRadius + Math.sin(nowSec * 1.3 + i * 0.45) * 1.4;
+
+        // Затухание к краям: буквы на «боках» сферы мягче и мельче
+        const edgeFall = 1 - Math.pow(Math.abs(tParam - 0.5) * 2, 1.7);  // 0..1, максимум в центре
+        const shimmer = 0.90 + 0.10 * Math.sin(nowSec * 2.2 + i * 0.7);  // V0.0.4 — бегущий блик
+        const alpha = (0.35 + edgeFall * 0.60) * shimmer;
+        const size = fontPx * (0.72 + edgeFall * 0.38);
+
+        ctx.font = `900 ${size.toFixed(1)}px 'JetBrains Mono', monospace`;
+
+        // 0) V0.0.4 — тёмный контур: читаемость поверх ярких клеток
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = Math.min(1, alpha * 1.1);
+        ctx.lineWidth = Math.max(2.5, size * 0.22);
+        ctx.strokeStyle = 'rgba(3,8,13,0.85)';
+        ctx.strokeText(name[i], lx, ly);
+
+        // 1) Внешнее свечение (мягкий ореол)
+        ctx.globalAlpha = alpha * 0.55;
+        ctx.shadowColor = tint;
+        ctx.shadowBlur = 16 * zoom;
+        ctx.fillStyle = tint;
+        ctx.fillText(name[i], lx, ly);
+
+        // 2) Ядро буквы — светлое, на тон выше
+        ctx.shadowBlur = 0;
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#eaf8ff';
+        ctx.fillText(name[i], lx, ly);
+    }
+    ctx.restore();
+}
 function draw(){
     ctx.clearRect(0,0,W,H);
     const isFerrum=activePlanet&&activePlanet.biome==='ferrum';
@@ -6462,23 +6959,46 @@ function draw(){
     drawSpaceBackground(pal);
     if(!started||!activePlanet) return;
 
-    // V0.0.4.37 — атмосферное свечение сферы (мягкий ореол по краям)
+    // V0.0.3 (план 10 §1) — АТМОСФЕРНАЯ ОБОЛОЧКА: гало + rim-light по силуэту сферы
     (function(){
         const cx0 = W/2, cy0 = H/2;
-        const R0 = Math.min(W,H)*0.36*zoom * 1.35;
+        const R = Math.min(W,H)*0.36*zoom;               // точный радиус сферы (как в клетках)
         const t = performance.now() / 2600;
         const pulse = 0.5 + 0.5 * Math.sin(t);
-        const baseCol = pal.border || '#8ddfff';
-        const glow = ctx.createRadialGradient(cx0, cy0, R0*0.75, cx0, cy0, R0);
-        glow.addColorStop(0, 'rgba(0,0,0,0)');
-        glow.addColorStop(0.7, hexToRgba(baseCol, 0.06 + pulse*0.04));
-        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        const tint = pal.border || '#8ddfff';            // тема планеты (уже вычислена из seed)
+
         ctx.save();
         ctx.globalCompositeOperation = 'lighter';
-        ctx.fillStyle = glow;
-        ctx.beginPath();
-        ctx.arc(cx0, cy0, R0, 0, Math.PI*2);
-        ctx.fill();
+
+        // ── Слой 1: широкое гало, радиус R*1.55, размывает силуэт ──
+        const atmoR = R * 1.55;
+        const atmo = ctx.createRadialGradient(cx0, cy0, R*0.85, cx0, cy0, atmoR);
+        atmo.addColorStop(0.00, 'rgba(0,0,0,0)');
+        atmo.addColorStop(0.35, colorWithAlpha(tint, 0.035 + pulse*0.025));
+        atmo.addColorStop(0.70, colorWithAlpha(tint, 0.018 + pulse*0.012));
+        atmo.addColorStop(1.00, 'rgba(0,0,0,0)');
+        ctx.fillStyle = atmo;
+        ctx.beginPath(); ctx.arc(cx0, cy0, atmoR, 0, Math.PI*2); ctx.fill();
+
+        // ── Слой 2 (V0.0.4 переработка): лимб-ореол — мягкое свечение, ──
+        // обнимающее силуэт. Градиент вместо stroke: прежнее толстое кольцо
+        // читалось как «рамка», оторванная от поверхности планеты.
+        const limb = ctx.createRadialGradient(cx0, cy0, R*0.94, cx0, cy0, R*1.22);
+        limb.addColorStop(0.00, colorWithAlpha(tint, 0.10 + pulse*0.05));
+        limb.addColorStop(0.35, colorWithAlpha(tint, 0.05 + pulse*0.03));
+        limb.addColorStop(1.00, 'rgba(0,0,0,0)');
+        ctx.fillStyle = limb;
+        ctx.beginPath(); ctx.arc(cx0, cy0, R*1.22, 0, Math.PI*2); ctx.fill();
+
+        // ── Слой 3: верхний подсвет (top-light) — ощущение направления света ──
+        const topY = cy0 - R * 0.55;
+        const topGrd = ctx.createRadialGradient(cx0, topY, R*0.05, cx0, topY, R*0.95);
+        topGrd.addColorStop(0, colorWithAlpha('#eaf8ff', 0.05 + pulse*0.03));
+        topGrd.addColorStop(0.6, 'rgba(0,0,0,0)');
+        topGrd.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = topGrd;
+        ctx.beginPath(); ctx.arc(cx0, cy0, R, 0, Math.PI*2); ctx.fill();
+
         ctx.restore();
     })();
 
@@ -6930,6 +7450,87 @@ function draw(){
                 ctx.arc(pt.x, pt.y, Math.max(2.5, 3*zoom), 0, Math.PI*2);
                 ctx.fill();
             }
+            ctx.restore();
+        }
+    }
+
+    // V0.0.4 — внутреннее лимб-затемнение ПОВЕРХ клеток: объём сферы и
+    // «вклейка» силуэта. Тёмный ободок растворяется в поверхности вместо
+    // того, чтобы висеть отдельным кольцом.
+    (function(){
+        const cx0 = W/2, cy0 = H/2;
+        const R = Math.min(W,H)*0.36*zoom;
+        const t = performance.now() / 2600;
+        const pulse = 0.5 + 0.5 * Math.sin(t);
+        const tint = pal.border || '#8ddfff';
+        ctx.save();
+        const vig = ctx.createRadialGradient(cx0, cy0, R*0.62, cx0, cy0, R);
+        vig.addColorStop(0.00, 'rgba(0,0,0,0)');
+        vig.addColorStop(0.78, 'rgba(2,4,9,0.10)');
+        vig.addColorStop(1.00, 'rgba(2,4,9,0.42)');
+        ctx.fillStyle = vig;
+        ctx.beginPath(); ctx.arc(cx0, cy0, R, 0, Math.PI*2); ctx.fill();
+        // волосяная линия атмосферы по самому силуэту
+        ctx.strokeStyle = colorWithAlpha(tint, 0.12 + pulse*0.06);
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(cx0, cy0, R - 0.5, 0, Math.PI*2); ctx.stroke();
+        ctx.restore();
+    })();
+
+    // V0.0.3 (план 10 §2) — имя планеты на сфере (поверх клеток, под метеоритами)
+    drawPlanetName(pal);
+
+    // V0.0.3 (план 10 §5) — волна открытия мира: расходится от центра сферы
+    if(discoveryWave.active){
+        const R  = Math.min(W,H) * 0.36 * zoom;
+        const cx = W/2, cy = H/2;
+        const dt = (performance.now() - discoveryWave.t0) / 1000;
+        const prog = dt / discoveryWave.duration;
+        if(prog >= 1){
+            discoveryWave.active = false;
+            discoveryWave.sparks = [];
+        } else {
+            const fade = 1 - prog;                             // 1 → 0
+            const baseR = R * (0.10 + prog * 1.55);            // растёт от центра
+            const lagR  = Math.max(0, baseR - R * 0.14);
+            const farR  = Math.max(0, baseR - R * 0.30);
+
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+
+            // Кольцо 1 — тонкое яркое, ведущее
+            ctx.strokeStyle = colorWithAlpha(discoveryWave.color, 0.65 * fade);
+            ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.arc(cx, cy, baseR, 0, Math.PI*2); ctx.stroke();
+
+            // Кольцо 2 — широкое мягкое, чуть позади
+            ctx.strokeStyle = colorWithAlpha(discoveryWave.color, 0.22 * fade);
+            ctx.lineWidth = 12;
+            ctx.beginPath(); ctx.arc(cx, cy, lagR, 0, Math.PI*2); ctx.stroke();
+
+            // Кольцо 3 — дальнее слабое, добавляет глубину
+            ctx.strokeStyle = colorWithAlpha(discoveryWave.color, 0.10 * fade);
+            ctx.lineWidth = 22;
+            ctx.beginPath(); ctx.arc(cx, cy, farR, 0, Math.PI*2); ctx.stroke();
+
+            // Искры: радиальный разлёт, каждая со своей скоростью и задержкой
+            for(const s of discoveryWave.sparks){
+                const localProg = Math.max(0, Math.min(1, (prog - s.offset) / (1 - s.offset)));
+                if(localProg <= 0) continue;
+                const sr = R * (0.10 + localProg * 1.55 * s.speed);
+                const sx = cx + Math.cos(s.angle) * sr;
+                const sy = cy + Math.sin(s.angle) * sr;
+                const sa = s.alpha * fade * (1 - localProg * 0.55);
+
+                // Сама искра
+                ctx.fillStyle = colorWithAlpha(discoveryWave.color, sa);
+                ctx.beginPath(); ctx.arc(sx, sy, s.size * Math.max(0.6, zoom), 0, Math.PI*2); ctx.fill();
+
+                // Белое ядро искры — «точка света»
+                ctx.fillStyle = colorWithAlpha('#ffffff', sa * 0.5);
+                ctx.beginPath(); ctx.arc(sx, sy, s.size * Math.max(0.6, zoom) * 0.45, 0, Math.PI*2); ctx.fill();
+            }
+
             ctx.restore();
         }
     }
@@ -7528,6 +8129,11 @@ function gameLoop(now){
     const nowMsR=Date.now();
     if(nowMsR-lastPanelRefresh>400){
         lastPanelRefresh=nowMsR;
+        // V0.0.3 (план 10 §4+) — апдейт глубины для Летописи Воронии
+        {
+            const insight = (totalPrestiges|0) + (metaPrestiges|0) * 3;
+            if(insight > loreMaxInsight) loreMaxInsight = insight;
+        }
         renderMeteorBuffs();   // V0.0.4.31 — бейджи метеоритных баффов ~2.5 раза в секунду
         checkAchievements();   // V0.0.4.33 — достижения проверяются здесь же (~2.5 Гц), не каждый кадр
         if(baseModal.style.display==='block') renderBase();
@@ -7760,7 +8366,7 @@ function showCellInfo(c){
             const haveL=Math.max(planetGet(activePlanetId,'iron'),planetGet(activePlanetId,'kriogen'));
             const typeTxt = `<span style="color:${ameta.color};font-weight:bold;">${ameta.icon} ${ameta.name}</span>`;
             let effectTxt = '';
-            if(at === 'power')          effectTxt = ` · ${4*(1+lvl)*deep} Эн/с${c.isDeep?' · жилы −50%':' · жилы −30%'}`;
+            if(at === 'power')          effectTxt = ` · ${4*(1+lvl)*deep} Эн/с${c.isDeep?' · месторождения −50%':' · месторождения −30%'}`;
             else if(at === 'resonance') effectTxt = ` · ${(0.005*(1+lvl)*deep).toFixed(3)} 💎/с`;
             else                        effectTxt = ` · синтез ×${(1+lvl)*deep}`;
             // V0.0.4.42 — ПАТЧ 7: разделили — строка 2 = эффект, строка 3 = цена/действие
@@ -9711,7 +10317,7 @@ function renderExtraction(){
     const globalEnergyRate=energyPerSec*crystalMulti*getDustEnergyMult()*(flareActive?2:1)*weeklySurgeMult()*activeMeteorMult('energy');   // V0.0.4.31
     document.getElementById('prod-energy').textContent=`+${fmtRate(globalEnergyRate)}/с`;
     document.getElementById('prod-crystals').textContent=`+${fmtRate(getGlobalCrystalRate())}/с`;
-    document.getElementById('prod-research').textContent=`+${researchPerSec().toFixed(3)}/с`;
+    document.getElementById('prod-research').textContent=`+${fmtRate(researchPerSec())}/с`;   // V0.0.3 — VR-12
 }
 
 let stockPage=0;
@@ -10269,7 +10875,13 @@ const SFX = (()=>{
         reject:   ()=>tone(180, 0.14, 'sawtooth', 0.14),
         reward:   ()=>{ tone(520, 0.07, 'triangle', 0.20); setTimeout(()=>tone(880, 0.09, 'triangle', 0.18), 70); },
         achievement: ()=>{ [660,880,1320].forEach((f,i)=>setTimeout(()=>tone(f,0.14,'triangle',0.22), i*90)); },
-        prestige: ()=>{ [440,660,880,1320].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sine',0.20), i*130)); }
+        prestige: ()=>{ [440,660,880,1320].forEach((f,i)=>setTimeout(()=>tone(f,0.35,'sine',0.20), i*130)); },
+        // V0.0.3 (план 10 §5) — восходящее арпеджио: «мир открылся»
+        discovery: ()=>{
+            [440, 554, 660, 880, 1108].forEach((f, i) =>
+                setTimeout(() => tone(f, 0.22, 'sine', 0.16), i * 85)
+            );
+        }
     };
 })();
 function vibrate(ms){
@@ -10832,11 +11444,18 @@ document.getElementById('set-import-file')?.addEventListener('change',(e)=>{
 
 // ---- Кнопка «Поделиться сейвом» на титульнике ----
 function refreshTitleShareBtn(){
-    const btn = document.getElementById('title-share-btn');
-    if(!btn) return;
     let hasSave = false;
     try{ hasSave = !!localStorage.getItem('cosmicClickerV19'); }catch(e){}
-    btn.style.display = hasSave ? 'inline-block' : 'none';
+    const btn = document.getElementById('title-share-btn');
+    if(btn) btn.style.display = hasSave ? 'inline-block' : 'none';
+    // V0.0.3 — VR-18: «НОВАЯ ИГРА» видна только если есть сохранение,
+    // которое она может удалить. Пустой сейв — нечего стирать, незачем пугать.
+    const rb = document.getElementById('reset-btn');
+    if(rb) rb.style.display = hasSave ? '' : 'none';
+    // V0.0.4 — на пустом сейве единственная кнопка — «НАЧАТЬ ИГРУ»;
+    // с сейвом возвращаем привычную пару.
+    const sb = document.getElementById('start-btn');
+    if(sb) sb.textContent = hasSave ? 'НАЧАТЬ ИГРУ / ПРОДОЛЖИТЬ' : 'НАЧАТЬ ИГРУ';
 }
 document.getElementById('title-share-btn')?.addEventListener('click', ()=>{ shareOrCopySave(); });
 
@@ -11228,6 +11847,23 @@ const COMPOUNDS = {
     researchData:  { icon:'📊', name:'Блок данных',    color:'#4ddcff', research:'recipe_datablock',   bonus:0     }
 };
 
+// ============================================================
+// V0.0.4.48→v0.0.4 — ПЛАН 11: РЕАКТОР — масштаб сложности рецептов
+//
+// REACTOR_RECIPE_MULT — единая ручка сложности всех рецептов,
+// кроме отмеченных noScale. Значение 10000 = «+4 нуля» к каждому
+// входному ресурсу. Выход всегда 1 единица сплава.
+//
+// Тюнинг без правки рецептов:
+//   1        → старое «легко» (10 железо + 2 углерод = 1 сталь)
+//   100      → ×100
+//   10000    → ×10000 = текущий хардкор
+// У каждого рецепта может быть свой mult (приоритет: noScale → mult → ручка).
+// researchData помечен noScale: это конверсия ресурсов в науку,
+// у неё своя экономика (энергия — глобальная валюта, её нельзя ×10000).
+// ============================================================
+const REACTOR_RECIPE_MULT = 10000;
+
 const RECIPES = {
     steel:         { inputs: { iron:10, carbon:2 } },
     superalloy:    { inputs: { titanium:5, steel:2, carbon:3 } },
@@ -11239,7 +11875,7 @@ const RECIPES = {
     // Цена шардов зависит от перка «Древнее знание» (dynamic — см. recipeInputs)
     precursorRelic:{ inputs: { stellarCore:3, shards:'dynamic:relic' } },
     // V0.0.4.44 — ECONOMY v2: Блок данных — дорогая ручная конверсия ресурсов в науку
-    researchData:  { inputs: { energy:100000, silicon:25, carbon:25, steel:5 } }
+    researchData:  { inputs: { energy:100000, silicon:25, carbon:25, steel:5 }, noScale: true }
 };
 
 const AUTO_CRAFT_BASE_INTERVAL = 30000;   // 30 сек, или 15 с перком Древа Пыли
@@ -11309,17 +11945,26 @@ function recipeUnlocked(key){
     const def = COMPOUNDS[key]; if(!def) return false;
     return hasResearch(def.research);
 }
-// V0.0.4.39 — вычисляем входные ресурсы с учётом динамических значений
+// V0.0.4 — ПЛАН 11: входные ресурсы с учётом динамических значений
+// и общего множителя сложности REACTOR_RECIPE_MULT.
+// Динамические входы (shards в реликте) не масштабируются — они уже в
+// «правильных» единицах (80/100 штук, а не миллионы).
 function recipeInputs(key){
     const rec = RECIPES[key];
     if(!rec) return {};
+    // приоритет: rec.noScale → rec.mult → REACTOR_RECIPE_MULT
+    const M = rec.noScale ? 1 : (rec.mult || REACTOR_RECIPE_MULT);
     const out = {};
     for(const k in rec.inputs){
         let v = rec.inputs[k];
         if(typeof v === 'string' && v.startsWith('dynamic:')){
             if(v === 'dynamic:relic') v = esoRelicCost();
+            out[k] = v;                       // dynamic: не масштабируем
+        } else if(k === 'shards'){
+            out[k] = v;                       // осколки — отдельная валюта
+        } else {
+            out[k] = v * M;                   // обычные ресурсы — ×M
         }
-        out[k] = v;
     }
     return out;
 }
@@ -11403,15 +12048,19 @@ function renderLab(){
         const stock = compoundResources[key] || 0;
         const canOne = unlocked && canCraft(key, 1);
 
-        // Строка ингредиентов (V0.0.4.39 — с учётом динамических цен)
+        // V0.0.4 — ПЛАН 11: ингредиенты с учётом множителя сложности
         const inputs = recipeInputs(key);
         const inputLine = Object.keys(inputs).map(k=>{
             const need = inputs[k];
             const have = globalGet(k);
             const ok = have >= need;
             const r = RESOURCES[k] || {icon:'', color:'#fff', name:k};
-            const icon = (k === 'shards') ? '💫' : r.icon;   // V0.0.4.41 — осколки Вселенной
-            return `<span class="${ok?'ok':'no'}">${icon} ${fmtBig(need)}</span>`;
+            const icon = (k === 'shards') ? '💫' : r.icon;
+            // Прогресс: показываем «накоплено» в скобках, если не хватает —
+            // при ×10000 без этого крафт кажется недостижимым
+            const progress = ok ? '' :
+                ` <span style="color:#566a78;font-size:9px;">(${fmtBig(have)})</span>`;
+            return `<span class="${ok?'ok':'no'}">${icon} ${fmtBig(need)}${progress}</span>`;
         }).join(' + ');
 
         const bonusPct = (stock * def.bonus * esoCompoundMult() * 100).toFixed(1);
@@ -12265,7 +12914,7 @@ function bossPhase(b){
 const BOSS_REWARDS = [
     { id:'power',   icon:'⚡', title:'СИЛА ХРАНИТЕЛЯ',   desc:'+25% к доходу этой планеты (энергия, железо, криоген, редкие) до престижа' },
     { id:'crystal', icon:'💎', title:'КРИСТАЛЬНОЕ ЭХО',    desc:'+0.02 💎/с от этой планеты (глобально, до престижа)' },
-    { id:'reserve', icon:'⛏', title:'НЕДРА БЕЗДНЫ',       desc:'Все жилы планеты +50% к максимальному запасу сейчас и впредь' }
+    { id:'reserve', icon:'⛏', title:'НЕДРА БЕЗДНЫ',       desc:'Все месторождения планеты +50% к максимальному запасу сейчас и впредь' }
 ];
 
 function applyBossReward(p, rewardId){
@@ -12616,7 +13265,7 @@ function openBossModal(pid){
         }
         const destroyed = p.cells.filter(c => c && c._destroyed && (c._restoreAt||0) > now);
         if(destroyed.length){
-            showWarning(`🔧 Сначала восстановите ${destroyed.length} разрушенных ячеек`);
+            showWarning(`🔧 Сначала восстановите ${destroyed.length} разрушенных клеток`);
             return;
         }
         return;
@@ -12767,7 +13416,7 @@ function bossPunishPlayer(p){
     vibrate([100,50,100,50,200]);
     showToast(
         `💀 <b>Хранитель победил.</b><br>` +
-        `<span style="font-size:11px;">Разрушено ${N} ячеек на 15 минут.<br>` +
+        `<span style="font-size:11px;">Разрушено ${N} клеток на 15 минут.<br>` +
         `Следующий заход: босс +25% HP.</span>`,
         'danger', 8000
     );
@@ -12820,7 +13469,7 @@ function restoreCell(pid, cellId, {silent=false} = {}){
     }
 
     if(!silent){
-        spawnFloatingText(W/2, H/2, '🔧 Ячейка восстановлена','#5cf2b0');
+        spawnFloatingText(W/2, H/2, '🔧 Клетка восстановлена','#5cf2b0');
         SFX.upgrade && SFX.upgrade();
     }
     recomputeIncome();
@@ -12849,7 +13498,7 @@ function restoreAllCells(pid){
         }
     }
     if(restored > 0){
-        showToast(`🔧 Восстановлено ${restored} ячеек`,'success',3500);
+        showToast(`🔧 Восстановлено ${restored} клеток`,'success',3500);
         updateUI();
     }
     return { ok: restored>0, restored, spent };
@@ -13447,6 +14096,10 @@ resetBtn.addEventListener('click',()=>{
     // V0.0.4.31 — статус переносим внутрь титульника, а не в #help
     const st = document.getElementById('title-status');
     if(st) st.textContent = '⚑ Прогресс сброшен. Начните новую экспедицию';
+    // V0.0.4 — сейв стёрт: титульник возвращает единственную кнопку
+    // «НАЧАТЬ ИГРУ», а фон играет пульс прибывшего мира
+    refreshTitleShareBtn();
+    if(window.__ccTitleBg && window.__ccTitleBg.pulse) window.__ccTitleBg.pulse();
     const h=document.getElementById('help');
     if(h)h.textContent='';
 });
@@ -13480,7 +14133,8 @@ function resize(){
         nebulas: [],
         mx: 0.5, my: 0.5,     // сырое положение курсора (0..1)
         smx: 0.5, smy: 0.5,   // сглаженное
-        ready: false
+        ready: false,
+        flash: 0              // V0.0.4 — вспышка пульса прибытия
     };
     window.__ccTitleBg = T;
 
@@ -13708,6 +14362,7 @@ function resize(){
 
     function draw(){
         const w = T.W, h = T.H;
+        T.flash = Math.max(0, (T.flash||0) - (T.dt||0.016)*1.8);   // V0.0.4 — затухание вспышки
 
         // 1. Базовый градиент
         const bg = c.createRadialGradient(w*0.5, h*0.42, 0, w*0.5, h*0.5, Math.max(w,h)*0.85);
@@ -13800,6 +14455,15 @@ function resize(){
         vg.addColorStop(1, 'rgba(0,0,0,0.58)');
         c.fillStyle = vg;
         c.fillRect(0,0,w,h);
+
+        // 6. V0.0.4 — вспышка пульса прибытия (после «НОВОЙ ИГРЫ»)
+        if(T.flash > 0){
+            c.save();
+            c.globalCompositeOperation = 'lighter';
+            c.fillStyle = `rgba(190,235,255,${(T.flash*0.16).toFixed(3)})`;
+            c.fillRect(0,0,w,h);
+            c.restore();
+        }
     }
 
     function loop(now){
@@ -13836,6 +14500,15 @@ function resize(){
         T.dt = 0.016;
         draw();
         return { seeds: (T.seeds||[]).length, t: T.t };
+    };
+    // V0.0.4 — пульс «прибытия»: волна из центра диаграммы + вспышка.
+    // Играется на титульнике после «НОВОЙ ИГРЫ» (сейв стёрт — новый мир).
+    T.pulse = function(){
+        if(!T.ready) init();
+        T.wave = { active:true, x:T.W/2, y:T.H/2, r:0,
+                   speed: Math.max(T.W, T.H) * 0.85, next:0,
+                   hit: new Array(T.seeds.length).fill(0) };
+        T.flash = 1;
     };
 
     // Параллакс от курсора/пальца
@@ -14014,12 +14687,20 @@ window.__ccDebug = {
     },
     mixForce: function(pid){
         const p = PLANETS[pid || activePlanetId];
-        if(!p) return false;
-        p._mixed = false;                 // принудительный повтор
+        if(!p) return { ok:false, reason:'no planet' };
+        // V0.0.3 (план 10 §3) — защита: повторный merge уже слитых клеток
+        // превращает мозаику в кашу и может сломать explored-сет.
+        if(p._mixed){
+            return {
+                ok:false,
+                reason:'already merged',
+                hint:'Мир уже слит. Для теста новой формы открой СЛЕДУЮЩУЮ процедурную планету — новые сейвы пересоберутся с новыми параметрами климата.'
+            };
+        }
         const r = applyMixedGeometry(p);
         ensureCellColors(p);
         draw();
-        return r;
+        return { ok:!!r };
     },
     mixStats: function(){
         const out = [];
@@ -14225,7 +14906,31 @@ window.__ccDebug = {
     reservesRaw: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return 0; let s=0; p.explored.forEach(id=>{const c=p.cells[id]; if(c&&(c.type===3||c.type===5)&&isCellActive(c)) s+=Math.max(0,c.reserve||0);}); return s; },
     titleBg: function(){ const T=window.__ccTitleBg; return T?{running:T.running,ready:T.ready,stars:T.stars.length,nebulas:T.nebulas.length,W:T.W,H:T.H}:null; },
     // V0.0.4.38 — соединения
-    compoundState: function(){ return { stock:{...compoundResources}, bonusMult:compoundBonusMult() }; },
+    compoundState: function(){ return { stock:{...compoundResources}, bonusMult:compoundBonusMult(), mult:REACTOR_RECIPE_MULT }; },
+    // V0.0.4 — ПЛАН 11: посмотреть рецепт с текущим множителем
+    recipeProbe: function(key){
+        const rec = RECIPES[key];
+        if(!rec) return null;
+        const inputs = recipeInputs(key);
+        return {
+            key,
+            noScale: !!rec.noScale,
+            mult: rec.noScale ? 1 : (rec.mult || REACTOR_RECIPE_MULT),
+            inputs
+        };
+    },
+    // V0.0.4 — ПЛАН 11: накинуть запасы для теста баланса
+    forceStockCompounds: function(n){
+        n = Number(n) || 1000000;
+        energy = Math.max(energy, n * 10);
+        for(const r of ['iron','kriogen']) planetAdd(activePlanetId, r, n);
+        for(const r of ['carbon','silicon','helium3','titanium','uranium','biomass','platinum','darkMatter']){
+            extraResources[r] = (extraResources[r] || 0) + n;
+        }
+        crystals += n;
+        updateUI();
+        return { energy, ...extraResources };
+    },
     grantCompound: function(key, n){ if(!COMPOUNDS[key]) return false; compoundResources[key] = (compoundResources[key]||0) + Math.max(0, Number(n)||0); recomputeIncome(); renderLab(); updateUI(); requestSave(); return compoundResources[key]; },
     craft: function(key, n){ return craftCompound(key, Number(n)||1); },
     unlockAllRecipes: function(){ ['recipe_steel','recipe_superalloy','recipe_condensate','recipe_plasma','recipe_darkComposite','recipe_stellarCore','recipe_relic'].forEach(id => researchPerks[id]=true); return Object.keys(researchPerks); },
@@ -14363,6 +15068,59 @@ window.__ccDebug = {
     bossReset: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return false; p.boss=null; ensureBossState(p); updateUI(); requestSave(); return true; },
     openBoss: function(pid){ openBossModal(pid||activePlanetId); return this.bossState(pid); },
     fullExplore: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return false; p.cells.forEach(c=>{ p.revealed.add(c.id); p.explored.add(c.id); }); recomputeIncome(); updateUI(); requestSave(); return true; },
+    // V0.0.3 (план 10 §4+) — превью летописи планеты (с прогрессией)
+    chronicle: function(pid){
+        const p = PLANETS[pid || activePlanetId];
+        if(!p) return null;
+        const frags = chronicleFragments(p);
+        return {
+            id: p.id,
+            name: p.name,
+            isUnique: !!p.isUnique,
+            planetIndex: p.planetIndex,
+            loreMaxInsight: loreMaxInsight,
+            openedCount: frags.filter(f => !f.locked).length,
+            totalCount: frags.length,
+            fragments: frags.map(f => ({
+                fig: f.index + 1,
+                tier: f.tier,
+                requires: f.requires,
+                locked: f.locked,
+                text: f.locked ? null : f.text
+            }))
+        };
+    },
+    // V0.0.3 (план 10 §4+) — принудительно выставить глубину (для смоук-теста)
+    setLoreDepth: function(v){
+        loreMaxInsight = Math.max(0, Number(v) || 0);
+        requestSave();
+        return loreMaxInsight;
+    },
+    // V0.0.3 (план 10 §5) — волна открытия мира (визуальный смоук-тест)
+    discoveryWave: function(pid, color){
+        const p = PLANETS[pid || activePlanetId];
+        if(!p) return false;
+        const col = color || (p.palette && p.palette.border) || '#7ee7ff';
+        fireDiscoveryWave(col);
+        return { ok: true, color: col };
+    },
+    // Сбросить флаг визита у планеты (чтобы волна сработала при следующем перелёте)
+    resetVisit: function(pid){
+        const p = PLANETS[pid || activePlanetId];
+        if(!p) return false;
+        p._visited = false;
+        requestSave();
+        return { id: p.id, visited: false };
+    },
+    // Состояние волны
+    waveState: function(){
+        return {
+            active: discoveryWave.active,
+            color: discoveryWave.color,
+            sparks: discoveryWave.sparks.length,
+            tSinceStart: discoveryWave.active ? (performance.now() - discoveryWave.t0) : 0
+        };
+    },
     bossBoostNow: function(n){ return applyBossBoost(Number(n)||1); },
     // V0.0.4.41 — Волна 1: премиум
     // V0.0.4.42 — ПАТЧ 4: подписочная модель
@@ -14965,7 +15723,7 @@ window.addEventListener('resize', ()=>{
     window.addEventListener(ev, ()=>Music.unlock(), {once:true, passive:true});
 });
 
-console.log('[Voronia v0.0.2] Debug API: __ccDebug.listSaves() / .wipeAll() / .forceSave() / .forceLoad()');
+console.log('[Voronia v0.0.4] Debug API: __ccDebug.listSaves() / .wipeAll() / .forceSave() / .forceLoad()');
 
 })();
     // === v0.0.4.24: гиперпрыжок карта → планета ===
@@ -15228,4 +15986,4 @@ resize();
 </script>
 </body>
 </html>
-<!-- Voronia — Грани забытого мира · v0.0.2. Save/premium/code keys retained for backward compatibility. -->
+<!-- Voronia — Грани забытого мира · v0.0.4. Фиксы визуала (зеркало имени, атмосфера, кнопки титульника + пульс) + План 11 (Реактор ×10⁴). Save/premium/code keys retained for backward compatibility. -->

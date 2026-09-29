@@ -2129,7 +2129,7 @@ body.modal-open #cell-info-bar { display: none !important; }
                 ячейками, названными в честь математика Георгия Вороного. Ворония — это «страна Вороного»:
                 имя мира и есть математика, из которой он собран.</span>
                 <br><br>
-                <span style="color:#6b7782;">v0.0.1 · прогресс и премиум-коды прежних циклов переносятся автоматически</span>
+                <span style="color:#6b7782;">v0.0.2 · прогресс и премиум-коды прежних циклов переносятся автоматически</span>
             </div>
         </div>
 
@@ -2203,7 +2203,7 @@ body.modal-open #cell-info-bar { display: none !important; }
             <button id="reset-btn">НОВАЯ ИГРА</button>
             <button id="title-share-btn">📤 Поделиться сейвом</button>
             <div id="title-status"></div>
-            <div id="title-version">v0.0.1</div>
+            <div id="title-version">v0.0.2</div>
         </div>
         <div id="title-voronoi-tag">fig. 1 — разбиение Вороного · <span id="title-voronoi-seeds">34</span> семени<br><span>так устроена каждая планета Воронии</span></div>
     </div>
@@ -2238,7 +2238,7 @@ body.modal-open #cell-info-bar { display: none !important; }
 </div>
 
 <script>
-const GAME_VERSION = '0.0.1';
+const GAME_VERSION = '0.0.2';
 const SAVE_SCHEMA_VERSION = 31;   // V0.0.4.44 — ячейки исследований (type 6); V0.0.4.43 — Босс v2; V0.0.4.42 — смешанная геометрия
 
 (()=>{'use strict';
@@ -2850,6 +2850,7 @@ let research=0, researchTotal=0;
 // 3 — добыча, 4 — добыча открыта, 5 — склад открыт, 6 — первое улучшение.
 let tutorialStage=0;
 let tutorialCompleted=false;
+let onbWarehouseSeen=false;   // V0.0.2 — игрок хоть раз открывал Склад (персистится в сейве)
 
 // === РЕЕСТР РЕСУРСОВ (V20) ===
 const RESOURCES = {
@@ -3127,6 +3128,7 @@ let planetIncome={};
 let offlinePlanetId='ferrum';
 let offlineReport=null, offlinePendingSeconds=0, lastTick=0;
 let gameSession=null, offlineModalVisible=false;
+let onbPendingStep=null;   // V0.0.2 — отложенный старт онбординга (ждёт закрытия модалки)
 
 
 // === GEOMETRY ===
@@ -3417,6 +3419,9 @@ function openModal(modalElement){
     closeOverlays();
     setGameUtilityButtonsVisible(false);
     if(modalElement===offlineModal) offlineModalVisible=true;
+    // V0.0.2 — фиксируем первое открытие Склада (персистится; ловит все пути:
+    // кнопка, alias «ДОБЫЧА», FAB) — шаг обучения «Склад» не повторится после релоада
+    if(modalElement===baseModal && !onbWarehouseSeen){ onbWarehouseSeen=true; requestSave(); }
 }
 
 function closeModals(){
@@ -3430,6 +3435,11 @@ function closeModals(){
     offlineModalVisible=false;
     setActiveTab('planet');
     setGameUtilityButtonsVisible(!!started);
+    // V0.0.2 — онбординг ждал закрытия модалки (офлайн-отчёт и т.п.) — запускаем
+    if(onbPendingStep != null){
+        const step = onbPendingStep; onbPendingStep = null;
+        setTimeout(()=>{ if(started && !tutorialCompleted && window.__ccOnbStart) window.__ccOnbStart(step); }, 0);
+    }
 }
 function closeOverlays(){ overlays.forEach(o=>o.classList.remove('open')); }
 document.addEventListener('keydown',e=>{
@@ -5142,7 +5152,7 @@ function saveGame(){
 const data={version:SAVE_SCHEMA_VERSION,gameVersion:GAME_VERSION,timestamp:Date.now(),offlinePlanetId:activePlanetId,
     energy,iron,kriogen,crystals,dust,dustTotal,totalPrestiges,dustPerks,gameStartSeed,
     research,researchTotal,researchPerks,currentCost,tech,MAX_LEVEL,zoom,rotX,rotY,
-    tutorialStage,tutorialCompleted,
+    tutorialStage,tutorialCompleted,onbWarehouseSeen,
     activePlanetId,unlockedPlanets:Array.from(unlockedPlanets),sonarActivatedPlanets:Array.from(sonarActivatedPlanets),
     planets,planetaryGraph:GAME.serializeGraph(),devicePower,deviceScore,
     extraResources,extraResourcesPerSec,deliveries,dailyState,weekly,fleet,meteorBuffs,achievements:unlockedAchievements,achTiersClaimed,
@@ -5196,7 +5206,7 @@ function saveIntegrityAudit(){
                 else if(cargoWeight(m)>fleetCap()+1e-6) errors.push('перегруженная доставка');
             }
         }
-        const data={version:SAVE_SCHEMA_VERSION,gameVersion:GAME_VERSION,timestamp:Date.now(),energy,iron,kriogen,crystals,dust,dustTotal,totalPrestiges,dustPerks,gameStartSeed,research,researchTotal,researchPerks,currentCost,tech,MAX_LEVEL,zoom,rotX,rotY,tutorialStage,tutorialCompleted,activePlanetId,unlockedPlanets:Array.from(unlockedPlanets),sonarActivatedPlanets:Array.from(sonarActivatedPlanets),planets,planetaryGraph:GAME.serializeGraph(),extraResources,extraResourcesPerSec,deliveries,dailyState,weekly,fleet,meteorBuffs,achievements:unlockedAchievements};
+        const data={version:SAVE_SCHEMA_VERSION,gameVersion:GAME_VERSION,timestamp:Date.now(),energy,iron,kriogen,crystals,dust,dustTotal,totalPrestiges,dustPerks,gameStartSeed,research,researchTotal,researchPerks,currentCost,tech,MAX_LEVEL,zoom,rotX,rotY,tutorialStage,tutorialCompleted,onbWarehouseSeen,activePlanetId,unlockedPlanets:Array.from(unlockedPlanets),sonarActivatedPlanets:Array.from(sonarActivatedPlanets),planets,planetaryGraph:GAME.serializeGraph(),extraResources,extraResourcesPerSec,deliveries,dailyState,weekly,fleet,meteorBuffs,achievements:unlockedAchievements};
         const json=JSON.stringify(data);
         const parsed=JSON.parse(json);
         if(!parsed.planets || Object.keys(parsed.planets).length!==Object.keys(GAME.PLANETS).length) errors.push('планеты потерялись при JSON round-trip');
@@ -5284,6 +5294,7 @@ function loadGame(){
         currentCost=Number(data.currentCost)||baseCost;
         tutorialStage=Math.max(0,Math.min(6,Number(data.tutorialStage)||0));
         tutorialCompleted=!!data.tutorialCompleted;
+        onbWarehouseSeen=!!data.onbWarehouseSeen;   // V0.0.2
         if(Number(data.version||0) < 22){ tutorialStage=6; tutorialCompleted=true; }
         const st=data.tech||{};
         tech={costScale:Number(st.costScale)||0,ironBoost:Number(st.ironBoost)||0,maxLevel:Number(st.maxLevel)||0,crystalBoost:Number(st.crystalBoost)||0,kriogenBoost:Number(st.kriogenBoost)||0,therm:Number(st.therm)||0,hyperdrill:Number(st.hyperdrill)||0,recon:Number(st.recon)||0};
@@ -8018,6 +8029,7 @@ document.getElementById('prestige-confirm-btn').addEventListener('click', () => 
     for(const k in extraResources) extraResources[k]=0;
     syncActiveToStorage();
     recomputeIncome(); updateKriogenVisibility(); renderTechs(); updatePrestigeUI(); updateUI(); renderDustTree();
+    if(window.__ccOnbHide) window.__ccOnbHide();   // V0.0.2 — оверлей обучения не висит поверх сброшенной планеты
     closeModals();
     btnDust.style.display='flex';
     spawnFloatingText(W/2,H/2,`+${boostedGain} КОСМИЧЕСКОЙ ПЫЛИ!`,'#ff4d9d');
@@ -8467,6 +8479,7 @@ function renderSonarKriosPanel(){
 function unlockKriosFromPanel(bonus){
     SFX.reward(); vibrate([30,40,30]);   // V0.0.4.33
     unlockedPlanets.add('krios');
+    if(window.__ccOnbEvent) window.__ccOnbEvent('krios');   // V0.0.2 — без этого шаг обучения «Криос» висит вечно
     if(GAME.PlanetaryGraph.nodes.krios) GAME.PlanetaryGraph.nodes.krios.discovered=true;
     if(gameSession) gameSession.planetsUnlocked++;
     let newPlanet = null;
@@ -10635,6 +10648,15 @@ function importSaveBase64(b64){
     try{
         const obj = JSON.parse(raw);
         if(!obj || (!obj.planets && !obj.ferrum && !obj.krios)) return false;
+        // V0.0.2 — чистим конкурирующие ключи: loadGame() выбирает сейв по
+        // timestamp среди ВСЕХ cosmicClicker*, и старый ключ с более свежим
+        // timestamp молча перебил бы импорт.
+        try{
+            for(let i=localStorage.length-1;i>=0;i--){
+                const k=localStorage.key(i);
+                if(k && /^cosmicClicker/i.test(k) && k!=='cosmicClickerV19') localStorage.removeItem(k);
+            }
+        }catch(e){}
         localStorage.setItem('cosmicClickerV19', raw);
         return true;
     }catch(e){ return false; }
@@ -11975,6 +11997,7 @@ function doMetaPrestige(){
     updateMetaUI();
     updatePrestigeUI();
     updateUI();
+    if(window.__ccOnbHide) window.__ccOnbHide();   // V0.0.2 — как и в обычном престиже
     closeModals();
     saveGame();
     SFX.prestige && SFX.prestige();
@@ -13246,7 +13269,11 @@ function startGame(){
         setGameUIVisible(true);
         closeOverlays(); setActiveTab('planet');
         // V0.0.4.31 — возобновить онбординг, если ушли на титульник посреди шага
-        if(window.__ccOnbResume) setTimeout(()=>{ if(started && window.__ccOnbResume) window.__ccOnbResume(); }, 600);
+        // V0.0.2 — но НЕ поверх открытой модалки (офлайн-отчёт и т.п.)
+        if(window.__ccOnbResume) setTimeout(()=>{
+            if(started && !offlineModalVisible &&
+               !modals.some(m=>m && m.style.display==='block') && window.__ccOnbResume) window.__ccOnbResume();
+        }, 600);
         offlinePendingSeconds=0;
         offlineReport=null;
         sonarActivatedPlanets=new Set();
@@ -13255,7 +13282,8 @@ function startGame(){
         if(!loadGame()){
             // Чистый запуск всегда начинается с базовой стоимости скана.
             currentCost=baseCost;
-            tutorialStage=0; tutorialCompleted=false;
+            tutorialStage=0; tutorialCompleted=false; onbWarehouseSeen=false; onbPendingStep=null;
+            try{ localStorage.removeItem(ONB_STORAGE_KEY); }catch(e){}   // V0.0.2 — гарантия: новая игра = новый туториал
             dust=0; dustTotal=0; totalPrestiges=0;
             research=0; researchTotal=0;
             tech={costScale:0,ironBoost:0,maxLevel:0,crystalBoost:0,kriogenBoost:0,therm:0,hyperdrill:0,recon:0};
@@ -13297,13 +13325,18 @@ function startGame(){
         _ccMilestoneFlags={krios:false,depleted:false,anomaly:false,deep:false,prestige:false,escalation:false,nextWorldPid:null};
         tutorialFlags.step=0; tutorialFlags.dismissed=!!tutorialCompleted; renderCoach();
         // Только после фактического входа в игру разрешаем игровые кнопки.
-        setGameUtilityButtonsVisible(true);
+        // V0.0.2 — но не поверх офлайн-модалки (openModal их прячет, а startGame
+        // раньше включал их обратно безусловно)
+        setGameUtilityButtonsVisible(!offlineModalVisible);
         draw();
         requestAnimationFrame(gameLoop);
         tutorialHint();
-        // V0.0.4.25 — запускаем онбординг только для нового сейва
-        if(!tutorialCompleted && gameSession && gameSession.scanned===0){
-            setTimeout(()=>{ if(window.__ccOnbStart) window.__ccOnbStart(); }, 900);
+        // V0.0.2 — обучение по РЕАЛЬНОМУ прогрессу мира, а не по gameSession.scanned
+        // (resetSession() обнуляет его на каждом входе — старый чек был бесполезен).
+        // maybeLaunchOnb() сама решает: показать с нужного шага, отложить из-за
+        // модалки или завершить (игрок уже далеко / не первый цикл).
+        if(!tutorialCompleted){
+            setTimeout(()=>{ if(started) maybeLaunchOnb(); }, 900);
         }
     }catch(err){
         started=false;
@@ -13370,7 +13403,7 @@ resetBtn.addEventListener('click',()=>{
     energy=0; iron=0; kriogen=0; crystals=0;
     dust=0; dustTotal=0; totalPrestiges=0;
     research=0; researchTotal=0;
-    tutorialStage=0; tutorialCompleted=false;
+    tutorialStage=0; tutorialCompleted=false; onbWarehouseSeen=false; onbPendingStep=null;
     currentCost=baseCost;
     MAX_LEVEL=20;
     tech={costScale:0,ironBoost:0,maxLevel:0,crystalBoost:0,kriogenBoost:0,therm:0,hyperdrill:0,recon:0};
@@ -14401,7 +14434,11 @@ const ONB_STEPS=[
         text:'Первый тап выделяет клетку и показывает цену. Второй тап по той же клетке — сканирует. Начни с любой жёлтой рядом с центром.',
         target:'canvas',
         waitFor:'scan',
-        getRect:()=>onbCellRect((c,id)=>!activePlanet.explored.has(id) && c.type !== 4)
+        // V0.0.2 — подсветка ведёт ТОЛЬКО на клетки, дающие энергию (жёлтая
+        // приоритетом, затем богатая/редкая). Ресурсные (3/5) и исследовательская
+        // (6) при скане дают 0 Эн/с — новичок тратил скан и получал «ноль».
+        getRect:()=> onbCellRect((c,id)=>!activePlanet.explored.has(id) && c.type===0)
+                  || onbCellRect((c,id)=>!activePlanet.explored.has(id) && (c.type===1 || c.type===2))
     },
     {
         title:'Улучши открытую клетку',
@@ -14442,8 +14479,25 @@ const ONB_STEPS=[
 
 let onbStep=0, onbActive=false, onbRectInterval=null;
 
-function onbSeen(){ try{ return localStorage.getItem(ONB_STORAGE_KEY)==='1'; }catch(e){ return false; } }
-function onbMark(){ try{ localStorage.setItem(ONB_STORAGE_KEY,'1'); }catch(e){} }
+// V0.0.2 — единый источник истины: флаг tutorialCompleted в сейве.
+// legacy-ключ exo_onboarding_done_v25 читается один раз как миграция и удаляется.
+function onbSeen(){
+    if(tutorialCompleted) return true;
+    try{
+        if(localStorage.getItem(ONB_STORAGE_KEY)==='1'){
+            tutorialCompleted=true;                       // миграция старого игрока
+            if(typeof requestSave==='function') requestSave();
+            localStorage.removeItem(ONB_STORAGE_KEY);     // ключ больше не нужен
+            return true;
+        }
+    }catch(e){}
+    return false;
+}
+function onbMark(){
+    tutorialCompleted=true;
+    if(typeof requestSave==='function') requestSave();
+    try{ localStorage.removeItem(ONB_STORAGE_KEY); }catch(e){}
+}
 
 function onbApplyRect(rect){
     const spot=document.getElementById('onb-spot');
@@ -14491,6 +14545,10 @@ function onbShow(step){
     document.getElementById('onb-kicker').textContent=`ШАГ ${step+1} ИЗ ${ONB_STEPS.length}`;
     document.getElementById('onb-title').textContent=s.title;
     document.getElementById('onb-text').textContent=s.text;
+    // V0.0.2 — на шагах, ждущих действие, кнопки «Понял» нет: шаг двигает
+    // только само действие (onbEvent). Остаётся «Пропустить».
+    const btnNext=document.getElementById('onb-next');
+    if(btnNext) btnNext.style.display = (s.waitFor && !s.manual) ? 'none' : '';
 
     const update=()=>{
         const rect=s.getRect ? s.getRect() : null;
@@ -14515,10 +14573,11 @@ function onbFinish(){
 function onbNext(){
     const s=ONB_STEPS[onbStep];
     if(!s) return onbFinish();
-    // Если шаг не ждёт события — сразу идём дальше
-    if(!s.waitFor || s.manual){ onbShow(onbStep+1); }
-    // Если ждёт событие — кнопка «Понял» не закрывает, а подсвечивает: ждём действие
-    else onbShow(onbStep+1);
+    // V0.0.2 FIX — шаг ждёт РЕАЛЬНОГО действия игрока: двигать его вправе
+    // только onbEvent(). Раньше обе ветки вызывали onbShow(onbStep+1) —
+    // гейтинг обучения был фиктивным.
+    if(s.waitFor && !s.manual) return;
+    onbShow(onbStep+1);
 }
 
 function onbEvent(eventName){
@@ -14530,11 +14589,62 @@ function onbEvent(eventName){
     }
 }
 
-function onbStart(){
+// V0.0.2 — прогресс обучения по СОСТОЯНИЮ МИРА, а не по runtime-счётчику.
+// Стартовая клетка всегда в explored (initStart) — это не скан. Перк reveal_start
+// открывает ещё и соседей старта — их тоже вычитаем, чтобы «новая игра» не
+// считалась прогрессом.
+function tutorialWorldProgress(){
+    const p = PLANETS.ferrum || activePlanet;      // обучение привязано к Ферруму
+    if(!p || typeof p.explored === 'undefined')
+        return { scans:0, upgrades:0, pristine:true, startStep:0 };
+
+    const free = new Set([p.startingCellId]);
+    if(typeof hasPerk === 'function' && hasPerk('reveal_start')){
+        const st = p.cells[p.startingCellId];
+        if(st) for(const n of (st.neighbors||[])) free.add(n);
+    }
+    let scans = 0, upgrades = 0;
+    p.explored.forEach(id=>{
+        const c = p.cells[id];
+        if(!c) return;
+        if(!free.has(id)) scans++;          // открыто сверх старта = скан
+        if((c.level|0) > 0) upgrades++;     // улучшенные клетки
+    });
+
+    // Гард циклов: престиж/метапрестиж пересоздают планеты, поэтому
+    // «нетронутый мир» ещё не значит «новый игрок». totalPrestiges обнуляется
+    // метапрестижем — поэтому проверяем и metaPrestiges.
+    const firstCycle = (totalPrestiges|0)===0 && (metaPrestiges|0)===0;
+    let startStep = 0;
+    if(onbWarehouseSeen)   startStep = 4;   // Склад уже открывал → к шагу «Криос»
+    else if(upgrades > 0)  startStep = 3;   // улучшал → к шагу «Склад»
+    else if(scans > 0)     startStep = 2;   // сканировал → к шагу «Улучши»
+    return { scans, upgrades, pristine:firstCycle && scans===0 && upgrades===0, startStep };
+}
+
+// Единая точка запуска: решает, показывать ли обучение и с какого шага.
+function maybeLaunchOnb(){
+    if(tutorialCompleted || !started) return;
+    if((totalPrestiges|0) > 0 || (metaPrestiges|0) > 0){ onbFinish(); return; }  // не первый цикл
+    if(unlockedPlanets.has('krios')){ onbFinish(); return; }                      // игрок уже далеко
+    const prog = tutorialWorldProgress();
+    if(prog.startStep >= ONB_STEPS.length){ onbFinish(); return; }
+    // Не мешаем открытой модалке (офлайн-отчёт/склад) — откладываем,
+    // дожмём в closeModals().
+    if(offlineModalVisible || modals.some(m=>m && m.style.display==='block')){
+        onbPendingStep = prog.startStep;
+        return;
+    }
+    onbPendingStep = null;
+    if(window.__ccOnbStart) window.__ccOnbStart(prog.startStep);
+}
+
+function onbStart(step){
     if(onbSeen()) return;
     onbActive=true;
+    const start = (Number.isInteger(step) && step>=0 && step<ONB_STEPS.length) ? step : 0;
     // Небольшая задержка, чтобы UI успел отрисоваться
-    setTimeout(()=>onbShow(0), 500);
+    setTimeout(()=>onbShow(start), 500);
 }
 
 // Навешиваем кнопки
@@ -14855,7 +14965,7 @@ window.addEventListener('resize', ()=>{
     window.addEventListener(ev, ()=>Music.unlock(), {once:true, passive:true});
 });
 
-console.log('[Voronia v0.0.1] Debug API: __ccDebug.listSaves() / .wipeAll() / .forceSave() / .forceLoad()');
+console.log('[Voronia v0.0.2] Debug API: __ccDebug.listSaves() / .wipeAll() / .forceSave() / .forceLoad()');
 
 })();
     // === v0.0.4.24: гиперпрыжок карта → планета ===
@@ -15118,4 +15228,4 @@ resize();
 </script>
 </body>
 </html>
-<!-- Voronia — Грани забытого мира · v0.0.1. Save/premium/code keys retained for backward compatibility. -->
+<!-- Voronia — Грани забытого мира · v0.0.2. Save/premium/code keys retained for backward compatibility. -->

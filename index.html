@@ -19,6 +19,81 @@
        Сейв: SAVE_SCHEMA_VERSION = 37 (guardian/overlordBuff, миграция из boss).
      ============================================================ -->
 <!-- ============================================================
+     VORONIA v0.0.3.4 (2026-10-01) — ФИКСЫ ТЕСТИРОВАНИЯ v0.0.3.3:
+       1) ПРОТУБЕРАНЕЦ СТАЛ ВИДЕН (правки 3, патч 2): в 0.0.3.3 ветка
+          «солнечных петель» оказалась вложена в «кулдаун истёк», но
+          кулдаун разряда (45/90 с) всегда длиннее активного окна
+          (20/25 с) — на реальной планете протуберанец не рисовался
+          никогда. Теперь выбор ветки живёт в cellChargeVisualState(c,
+          nowMs) и проверяется в правильном порядке: недавно разряжена
+          → протуберанец; иначе кулдаун → кольцо прогресса; иначе →
+          пульс «готов к разряду». Семантика исходного ТЗ восстановлена.
+       2) ПРОДАКШЕН БАННЕРА БАЗЫ КОДОВ (правки 3, патч 1): подпись-
+          диагноз под ЗЕЛЁНОЙ схемой («N SHA-хэшей · premium/codes.js ·
+          встроенный SHA-256») убрана — при успешном подключении видны
+          только схема с искрами и «Контур премиум-кодов активен».
+          Текстовый диагноз ошибок (нет файла / пусто / соль / синтаксис)
+          сохранён: он показывается лишь когда контур действительно не
+          работает и продавцу нужна причина.
+       3) QA: __ccDebug.prominenceStateProbe(id, pid, nowMs) — какая
+          ветка визуала будет у богатой/редкой клетки ('prominence' /
+          'cooldown' / 'ready'), с возможностью «перемотать» время;
+          харнес prominence-fix-check.js проверяет полный сценарий
+          устройства: chargeCell → ветка → таймлайн 0/20/45 с (rich)
+          и 0/25/90 с (rare) → атлас 12×96.
+     ============================================================ -->
+<!-- ============================================================
+     VORONIA v0.0.3.3 (2026-10-03) — ВИЗУАЛИЗАЦИЯ ХРАНИТЕЛЯ + «ПРАВКИ 3»:
+       1) ХРАНИТЕЛЬ — БОЛЬШЕ НЕ «ОКНО С ТРЕМЯ ПОЛОСКАМИ»: в бою на
+          canvas #bf-visual живёт сущность текущей формы (Страж — щит-дрон
+          с глазом и струёй; Хранитель — угловатый голем с ядром-глазом и
+          парящими осколками; Владыка — сфера с аккреционным диском, тремя
+          оками и короной). Слои фаз ЩИТ/БРОНЯ/ЯДРО рисуются вокруг неё:
+          пробитые гаснут и осыпаются осколками, текущий трескается и
+          тускнеет по мере потери HP, предстоящий едва намечен. Удар —
+          вспышка и искры; пробой фазы — золотая волна; срыв — красная.
+          В панели планеты и «Активность → Хранитель» — SVG-портрет формы
+          с дугой прогресса/кулдауна, ready-пульсацией, трещинами после
+          победы. Всё процедурно, без ассетов.
+       2) ПАТЧ 1 (правки 3): статус базы премиум-кодов — визуальная схема
+          «планета ── спутник ── планета»: подключено → весь контур
+          зелёный с бегущими искрами; нет/пуста/повреждена → серый.
+          Диагноз причины остался текстовой подписью под схемой.
+       3) ПАТЧ 2 (правки 3): разряженная богатая/редкая клетка на время
+          баффа (CHARGE_CONFIG.baseDur) получает протуберанец — 12 кадров
+          × 2 цвета пре-рендерятся в оффскрин-атлас (96×96) и blit'ятся
+          через drawImage (дешевле градиентов); старый пульс «готов к
+          разряду» сохранён, прогресс-кольцо кулдауна не тронуто.
+       4) ХОТФИКС: восстановлена computeRestoreCost (утеряна при переходе
+          16.2→17) — срыв фазы/поражение/отражение Владыки больше не
+          падают с ReferenceError при уничтожении клеток Хранителем.
+     ============================================================ -->
+<!-- ============================================================
+     VORONIA v0.0.3.2 (2026-10-03) — ТРИАЖ ВНЕШНЕГО РЕВЬЮ + ПУНКТЫ 2–5:
+       1) Ревью (Pasted_Text_1791059090029): бой с Хранителем больше не
+          живёт невидимо после тапа мимо модалки (closeModals = отступление;
+          в модалке боя появилась кнопка «ОТСТУПИТЬ» — обработчик #boss-flee
+          уже существовал); панель Хранителя и «Ресурсы грани» снова видны
+          на «Обзоре» (pageHTML += вместо =); ачивки «Все ремёсла»/«Полимат»
+          достижимы (3 призвания, а не 5); gameLoop обёрнут в try/catch —
+          ошибка тика больше не убивает планету (лог в консоль + заголовок
+          вкладки ERR:…); сонар-мини-игра не оставляет невидимый rAF-цикл;
+          _hexRGB понимает короткий #abc; _build() логирует провал валидации.
+       2) ПОЛНОЭКРАННЫЙ РЕЖИМ: кнопка ⛶ на левой FAB-панели — вход;
+          повторное нажатие или Esc — возврат. iOS: подсказка «На экран Домой».
+       3) ДЕФИЦИТ на планетах 3+: выход энергии/железа/криогена/редких
+          ×0.94…×0.55 (пол), истощение жил ×1.05…×1.50 (кап), офлайн тоже;
+          маркеры «⚠ДЕФИЦИТ» в HUD, в описании и в панели планеты.
+          Скрытый мир исключён (это награда).
+       4) СТОИМОСТЬ ПРОКАЧКИ РАСТЁТ ПОСЛЕ 19 УРОВНЯ: таблицы лестниц
+          продолжаются ×1.28/уровень; «чужой» ресурс ×1.22/уровень; кривые
+          выхода/запаса продолжаются после 25 уровня (×1.083/×1.104).
+       5) «ЧУЖОЙ» РЕСУРС ОБЯЗАТЕЛЕН: для апгрейдов 10+ требуется ресурс,
+          которого нет ни на текущей планете, ни в теме текущего рукава —
+          детерминированный выбор, логистика 🚚 обязательна; если во всей
+          галактике чужого ещё нет — мягкий откат (прогрессия не блокируется).
+     ============================================================ -->
+<!-- ============================================================
      VORONIA v0.0.3 — КОНСОЛИДИРОВАННЫЙ ИГРАБЕЛЬНЫЙ РЕЛИЗ (2026-10-01)
      Командная сборка: вся линия 0.0.16→0.0.26 + хотфиксы 23.1 + фиксы ревью:
        · интро: зонд → посадка → «Добро пожаловать» → обучение;
@@ -1414,6 +1489,8 @@ button{pointer-events:auto;cursor:pointer;font-family:inherit;}
 #fab-sonar { border-color: #5cf2b0; color: #5cf2b0; }
 #fab-sonar:hover { box-shadow: 0 0 20px rgba(92,242,176,0.55); }
 #fab-boss  { border-color: #ff5e5e; color: #ff8c8c; }
+#fab-fullscreen { border-color: #ffda47; color: #ffda47; }
+#fab-fullscreen.fs-on { background: rgba(255,218,71,.16); box-shadow: 0 4px 18px rgba(0,0,0,0.5), 0 0 20px rgba(255,218,71,.45); }
 #fab-boss:hover  { box-shadow: 0 0 20px rgba(255,94,94,0.55); }
 #floating-badges-left .fab-dot {
     position: absolute;
@@ -1880,6 +1957,72 @@ body.modal-open #info-btn { display: none !important; }
 }
 
 /* V0.0.4.41 — Волна 1: премиум */
+/* ============ V0.0.3.3 (патч 1) — индикатор контура премиум-кодов ============ */
+.premium-signal{
+    padding: 12px 14px 13px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 10px;
+    transition: border-color .3s, background .3s, box-shadow .3s;
+}
+.premium-signal.ok{
+    background: rgba(92,242,176,.05);
+    border: 1px solid rgba(92,242,176,.35);
+    box-shadow: inset 0 0 22px rgba(92,242,176,.10),
+                0 0 18px rgba(92,242,176,.10);
+}
+.premium-signal.fail{
+    background: rgba(70,80,100,.06);
+    border: 1px solid rgba(120,130,150,.22);
+}
+.premium-signal-svg{
+    width: 100%;
+    max-width: 340px;
+    height: auto;
+    display: block;
+    margin: 0 auto 8px;
+    overflow: visible;
+}
+.premium-signal-title{
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: .3px;
+    margin-bottom: 3px;
+}
+.premium-signal.ok   .premium-signal-title{
+    color: #a8ffd8;
+    text-shadow: 0 0 12px rgba(92,242,176,.35);
+}
+.premium-signal.fail .premium-signal-title{ color: #9aa5b8; }
+.premium-signal-hint{
+    font-size: 10.5px;
+    line-height: 1.45;
+    color: #91adbb;
+    letter-spacing: .2px;
+}
+.premium-signal-hint code{
+    color: #c8e4ff;
+    font-family: monospace;
+    font-size: 10px;
+    background: rgba(0,0,0,.3);
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+/* ============ V0.0.3.3 — SVG-портрет Хранителя (панель/Активность) ============ */
+.gv-row{ display:flex; gap:10px; align-items:center; margin:4px 0 2px; }
+.gv-art{ flex:0 0 104px; width:104px; }
+.gv-art svg{ width:104px; height:104px; display:block; }
+.gv-info{ flex:1; min-width:0; }
+.gv-need{ font-size:10px; color:#91adbb; margin-top:4px; }
+@keyframes gvPulse{
+    0%,100%{ filter:drop-shadow(0 0 2px var(--gv)); opacity:.92; }
+    50%    { filter:drop-shadow(0 0 9px var(--gv)); opacity:1; }
+}
+.gv-ready svg{ animation:gvPulse 2.4s ease-in-out infinite; }
+@keyframes gvSpin{ to{ transform:rotate(360deg); } }
+.gv-orbit{ transform-origin:60px 60px; animation:gvSpin 9s linear infinite; }
+@keyframes gvEye{ 0%,100%{ opacity:.55; } 50%{ opacity:1; } }
+.gv-eye{ animation:gvEye 2.8s ease-in-out infinite; }
 .premium-pack {
     display: flex; gap: 12px; align-items: center;
     padding: 12px 14px;
@@ -2354,6 +2497,10 @@ body.modal-open #info-btn { display: none !important; }
         <button class="fab" id="fab-radar" type="button" aria-label="Радар: зум галактики" style="">
             <span>🗺</span>
         </button>
+        <!-- V0.0.3.2 (п.2 пользователя) — полноэкранный режим: вход и возврат -->
+        <button class="fab" id="fab-fullscreen" type="button" aria-label="Полноэкранный режим" title="Полноэкранный режим">
+            <span id="fab-fullscreen-icon">⛶</span>
+        </button>
         <button class="fab" id="fab-boss" type="button" aria-label="Хранитель" style="display:none;">
             <span>⚔</span>
             <span class="fab-dot" id="fab-boss-dot"></span>
@@ -2717,9 +2864,16 @@ body.modal-open #info-btn { display: none !important; }
     <div id="boss-modal" class="modal tone-fire" style="border-color:#ff5e5e;max-width:500px;padding:16px;">
         <h3 class="modal-title" style="color:#ff8c8c">⚔ ХРАНИТЕЛЬ — ЭКОНОМИЧЕСКИЙ БОЙ</h3>
         <div style="text-align:center;font-size:11px;color:#91adbb;margin-bottom:8px;" id="boss-subline">Бей запасами, а не тапами: каждая кнопка списывает ресурс и снимает 1 HP фазы.</div>
+        <!-- V0.0.3.3 — визуализация Хранителя: сущность формы на canvas; слои ЩИТ/БРОНЯ/ЯДРО вокруг неё -->
+        <div id="bf-visual-wrap" style="margin:2px 0 8px;">
+            <canvas id="bf-visual" width="920" height="380" style="width:100%;height:auto;display:block;border-radius:12px;border:1px solid #4a1c1c;background:radial-gradient(ellipse at 50% 62%, rgba(52,12,24,.5), rgba(4,7,12,.92) 72%);"></canvas>
+            <div id="bf-visual-form" style="font-size:10px;font-weight:800;letter-spacing:1px;color:#ff8c8c;font-family:monospace;text-align:center;margin-top:5px;"></div>
+        </div>
         <div id="bf-phases" style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;"></div>
         <div id="bf-status" style="font-size:10px;color:#91adbb;text-align:center;margin-bottom:8px;font-family:monospace;"></div>
         <div id="bf-attacks" style="display:grid;grid-template-columns:repeat(2,1fr);gap:6px;"></div>
+        <!-- V0.0.3.2 (ревью, п.1) — явное отступление: обработчик #boss-flee уже был в коде, кнопки в HTML не было -->
+        <button id="boss-flee" class="menu-action-btn" type="button" style="width:100%;margin-top:10px;border-color:#91adbb;color:#cdd9e1;">🏳 ОТСТУПИТЬ <span class="sub-text" style="color:#91adbb;">без штрафа — можно вернуться в любой момент</span></button>
     </div>
 
     <div id="boss-reward-modal" class="modal" style="border-color:#ffda47;max-width:440px;">
@@ -3117,7 +3271,7 @@ if(!window.VORONIA_PREMIUM){
 }
 </script>
 <script>
-const GAME_VERSION = '0.0.3.1';   // V0.0.3.1 — хотфикс v0.0.3: восстановлены BOSS_REWARDS/applyBossReward (иначе не тапались клетки на сейвах с поверженным Хранителем), убрана карточка по тапу на имя планеты   // V0.0.16 — план 15 (очередь синтеза Реактора) + план 16 (A Летопись, B Разряд, C Ядро грани, D Сонар, E цены P4+) + ФИКС телепортации локальных ресурсов
+const GAME_VERSION = '0.0.3.4';   // V0.0.3.4 — фикс протуберанца (ветка была недостижима за кулдауном 45/90с > окно 20/25с): приоритетный выбор через cellChargeVisualState + QA-хук prominenceStateProbe; продакшен баннера базы кодов (диагностическая подпись под зелёной схемой убрана); V0.0.3.3 — визуализация Хранителя (canvas-сущность в бою + SVG-портрет в панели), баннер премиума «планета—спутник—планета», протуберанец разряженной клетки; V0.0.3.2 — триаж ревью + полноэкран ⛶ + дефицит P3+ + цены 19+ + «чужой» ресурс (планета+рукав); V0.0.3.1 — хотфикс v0.0.3: восстановлены BOSS_REWARDS/applyBossReward (иначе не тапались клетки на сейвах с поверженным Хранителем), убрана карточка по тапу на имя планеты   // V0.0.16 — план 15 (очередь синтеза Реактора) + план 16 (A Летопись, B Разряд, C Ядро грани, D Сонар, E цены P4+) + ФИКС телепортации локальных ресурсов
 const SAVE_SCHEMA_VERSION = 39;   // 🔒 V0.0.23 (план 23 B): FROZEN — не менять никогда
 const SAVE_SCHEMA_FROZEN = true;  // V0.0.23: всё новое — только через extensions
 const extensions = {};            // V0.0.23: пул расширений сейва
@@ -4819,6 +4973,11 @@ function openModal(modalElement){
     else if(modalElement===prestigeModal||modalElement===document.getElementById('meta-prestige-modal')||modalElement===document.getElementById('ascension-modal')) modalElement=document.getElementById('spiral-modal');
     else if(modalElement===dustModal||modalElement===document.getElementById('meta-tree-modal')) modalElement=document.getElementById('essence-modal');
     selectedCellId=null;   // V0.0.4.42 — ПАТЧ 3: снимаем выделение при открытии модалки
+    // V0.0.3.2 (ревью, п.1) — открытие ЛЮБОЙ другой модалки прячет бой с Хранителем:
+    // гасим бой (отступление), чтобы bossFightLoop не крутился «за кадром».
+    // Исключение — сама модалка боя (startBossFight открывает её при живом bossFight).
+    // getElementById вместо const bossModal — openModal определён раньше (TDZ-безопасно).
+    if(bossFight && modalElement !== document.getElementById('boss-modal')){ try{ closeBossModal(); }catch(e){} }
     document.body.classList.add('modal-open');
     modals.forEach(m=>{m.style.display='none';});
     closeAuxModals();
@@ -4837,6 +4996,11 @@ function closeModals(){
     // открыта. pointerdown на канвасе вызывает closeModals() на каждом тапе —
     // безусловный сброс ломал второй тап (выделение гасло до finishPointer).
     if(document.body.classList.contains('modal-open')) selectedCellId=null;
+    // V0.0.3.2 — ФИКС (ревью, п.1): тап мимо модалки прятал бой с Хранителем,
+    // но bossFightLoop продолжал крутиться невидимо: регенерация, срывы фаз и
+    // уничтожение клеток «за кадром» — один из сценариев «планета не откликается».
+    // Любое закрытие модалок = отступление (то же, что Escape).
+    if(bossFight){ try{ closeBossModal(); }catch(e){} }
     document.body.classList.remove('modal-open');
     modals.forEach(m=>{m.style.display='none';});
     closeAuxModals();
@@ -5534,6 +5698,10 @@ class Planet {
             this.seed=this.seed+1; 
             attempt++;
         }
+        // V0.0.3.2 (ревью, п.5) — seed+1 не меняет число клеток: ретраи были
+        // бесполезны. Логируем провал явно — «кривая» топология больше не
+        // пройдёт молча (потенциальный hit() → undefined).
+        console.warn('[planet] _build: валидация топологии провалилась после '+maxAttempts+' попыток:', this.id, this.geometry, 'f='+this.f);
     }
     _assignResources(isDeserializing){
         this.resourceList = [];
@@ -7214,9 +7382,10 @@ function recomputeIncome(){
         const scanBonusMult = (p.scanBonus && Date.now() < p.scanBonus.until) ? (p.scanBonus.mult||1) : 1;
         // V0.0.4.39 — скрытый мир даёт +10% ко всему (V0.0.4.42: +25% с перком «Сила скрытого»)
         const hiddenBonus = p.id === HIDDEN_WORLD_ID ? perkHiddenPowerMult() : 1.0;
-        const pEnergyBonus  = ((p.perks && p.perks.energyBonus)  || 1.0) * scanBonusMult * hiddenBonus * planetChargeMult(pid) * ((p.overlordBuff && Date.now()<p.overlordBuff.until) ? p.overlordBuff.mult : 1);   // V0.0.16 + V0.0.20
-        const pIronBonus    = ((p.perks && p.perks.ironBonus)    || 1.0) * scanBonusMult * hiddenBonus;
-        const pKriogenBonus = ((p.perks && p.perks.kriogenBonus) || 1.0) * scanBonusMult * hiddenBonus;
+        const defM = (p.biome==='hidden') ? 1 : planetDeficitMult(p.planetIndex);   // V0.0.3.2 (п.3) — дефицит P3+
+        const pEnergyBonus  = ((p.perks && p.perks.energyBonus)  || 1.0) * scanBonusMult * hiddenBonus * planetChargeMult(pid) * ((p.overlordBuff && Date.now()<p.overlordBuff.until) ? p.overlordBuff.mult : 1) * defM;   // V0.0.16 + V0.0.20 + V0.0.3.2 дефицит
+        const pIronBonus    = ((p.perks && p.perks.ironBonus)    || 1.0) * scanBonusMult * hiddenBonus * defM;   // V0.0.3.2 дефицит
+        const pKriogenBonus = ((p.perks && p.perks.kriogenBonus) || 1.0) * scanBonusMult * hiddenBonus * defM;   // V0.0.3.2 дефицит
         p.explored.forEach(id=>{
             const c=p.cells[id];
             if(!c) return;
@@ -7263,7 +7432,7 @@ function recomputeIncome(){
                         acc.kriogen+=yieldAmt*kriogenPerkMult*kriogenMult*pKriogenBonus*sec.kriogen*(foc.kriogen||1)*achR*mComp*mWare*mCore*mDrill*roleKriogen*bPower;
                     } else if(RESOURCES[key]){
                         // V0.0.4.42 — ПАТЧ 5: перки rare1/rare2 на редкие ресурсы
-                        acc.extra[key]=(acc.extra[key]||0)+yieldAmt*sec.rare*(foc[key]||1)*achR*mComp*mWare*mCore*roleRare*bPower*perkRareMult();
+                        acc.extra[key]=(acc.extra[key]||0)+yieldAmt*sec.rare*(foc[key]||1)*achR*mComp*mWare*mCore*roleRare*bPower*perkRareMult()*defM;   // V0.0.3.2 дефицит
                     }
                 }
             } else if(c.type===5){
@@ -7743,6 +7912,27 @@ function planetScanMult(idx){
     const k = idx - 3;
     return 1.0 + k * 0.35 + (Math.pow(1.10, k) - 1);
 }
+
+// ============================================================
+// V0.0.3.2 (п.3 пользователя) — ДЕФИЦИТ РЕСУРСОВ И ЭНЕРГИИ НА ПЛАНЕТАХ 3+
+// Дальние миры не обеспечивают себя сами: производство (энергия, железо,
+// криоген, редкие) падает с индексом мира, истощение жил ускоряется.
+// Смысл: энергоклетки, логистика 🚚 («чужие» ресурсы апгрейдов 10+),
+// роли планет и дары Хранителя становятся необходимостью, а не опцией.
+// Скрытый мир исключён (это награда за реликвии).
+//   выход:     P3 ×0.94 · P4 ×0.88 · P5 ×0.82 · P8 ×0.64 · P10+ ×0.55 (пол)
+//   истощение: P3 ×1.05 · P6 ×1.20 · P12+ ×1.50 (кап)
+// ============================================================
+function planetDeficitMult(idx){
+    const i = Number(idx) || 1;
+    if(i < 3) return 1.0;
+    return Math.max(0.55, 1 - 0.06 * (i - 2));
+}
+function planetDeficitDepleteMult(idx){
+    const i = Number(idx) || 1;
+    if(i < 3) return 1.0;
+    return Math.min(1.5, 1 + 0.05 * (i - 2));
+}
 function activeScanCost(){ 
     if(Date.now()<prestigeGrabUntil && prestigeGrabsUsed<3) return 0;   // V0.0.17 (A1): бесплатные «схваты» после пожара
     if(!activePlanet) return currentCost;
@@ -7771,7 +7961,9 @@ function planetShortDescription(p){
     const climate=d.climate?.name||'неизвестным климатом';
     const surface=d.surface?.name||'неизвестной поверхностью';
     const anomaly=d.anomaly?.name ? ` Аномалия: ${d.anomaly.name}.` : '';
-    return `Процедурный мир с ${climate.toLowerCase()} климатом и ${surface.toLowerCase()} поверхностью.${anomaly}`;
+    // V0.0.3.2 (п.3) — дефицит отражён в текстовом портрете мира
+    const defNote=((p.planetIndex||1)>=3 && p.biome!=='hidden') ? ` ⚠ Дефицит: выход ×${planetDeficitMult(p.planetIndex).toFixed(2)}, истощение ×${planetDeficitDepleteMult(p.planetIndex).toFixed(2)} — мир не обеспечивает себя сам.` : '';
+    return `Процедурный мир с ${climate.toLowerCase()} климатом и ${surface.toLowerCase()} поверхностью.${anomaly}${defNote}`;
 }
 
 // ============================================================
@@ -8006,9 +8198,14 @@ function cellLevelProfile(level){
     const l=Math.max(0,Number(level)||0);
     // V0.0.4.38 — после 10-го уровня цена растёт быстрее дохода:
     // поздняя прокачка сильнее, но требует промышленного запаса ресурсов.
-    const yieldMult=[1,1.11,1.25,1.40,1.58,1.78,2.00,2.25,2.52,2.82,3.14,3.48,3.85,4.25,4.68,5.15,5.65,6.20,6.80,7.45,8.15,8.90,9.70,10.55,11.45,12.40][Math.min(25,l)];
-    const reserveMult=[1,1.16,1.36,1.60,1.88,2.20,2.56,2.96,3.40,3.88,4.40,4.98,5.62,6.32,7.08,7.92,8.84,9.84,10.92,12.10,13.40,14.85,16.45,18.20,20.10,22.20][Math.min(25,l)];
-    return {yieldMult,reserveMult};
+    const Y=[1,1.11,1.25,1.40,1.58,1.78,2.00,2.25,2.52,2.82,3.14,3.48,3.85,4.25,4.68,5.15,5.65,6.20,6.80,7.45,8.15,8.90,9.70,10.55,11.45,12.40];
+    const Rs=[1,1.16,1.36,1.60,1.88,2.20,2.56,2.96,3.40,3.88,4.40,4.98,5.62,6.32,7.08,7.92,8.84,9.84,10.92,12.10,13.40,14.85,16.45,18.20,20.10,22.20];
+    if(l <= 25) return {yieldMult:Y[l], reserveMult:Rs[l]};
+    // V0.0.3.2 (п.4) — MAX_LEVEL поднимается до 120: продолжаем кривые темпом,
+    // которым таблицы заканчиваются (выход ×1.083/ур, запас ×1.104/ур) —
+    // соотношение «цена растёт быстрее дохода» сохраняется.
+    const k = l - 25;
+    return { yieldMult: Y[25]*Math.pow(1.083,k), reserveMult: Rs[25]*Math.pow(1.104,k) };
 }
 function cellLevelDepletionMult(c){
     const l=Math.max(0,Number(c&&c.level)||0);
@@ -8161,20 +8358,82 @@ function resourceAvailableInGalaxy(key){
     }
     return false;
 }
-// Какой «чужой» ресурс нужен для апгрейда с уровня lvl (0..19).
-// Если ресурс не открыт/недоступен — откат на более простой (×0.6 количества).
-function crossPlanetUpgradeResource(lvl){
+// ============================================================
+// V0.0.3.2 (п.5 пользователя) — «ЧУЖОЙ» РЕСУРС ОБЯЗАТЕЛЕН.
+// Апгрейд 10+ всегда требует ресурс, которого НЕТ ни на текущей планете
+// (resourceList + жилы), ни в теме текущего рукава (arm.focus) — логистика
+// 🚚 становится обязательной частью прокачки. Плюс (п.4): после 19 уровня
+// количество растёт ×1.22/уровень — раньше лестница обрывалась на 19→20.
+// Если во всей галактике доступного «чужого» ещё нет (ранняя игра) —
+// мягкий откат по цепочке простоты: прогрессия не блокируется.
+// ============================================================
+// Тема рукава: ресурсы из focus добываются на планетах этого рукава — они не «чужие»
+function armThemeResourceKeys(p){
+    const keys = new Set();
+    if(!p) return keys;
+    let arm = null;
+    try{ arm = p.armId ? armById(p.armId) : sectorOf(p.id); }catch(e){ arm = null; }
+    if(arm && arm.focus){ for(const k in arm.focus) keys.add(k); }
+    return keys;
+}
+function foreignResourceExclusions(p){
+    const ex = new Set(['iron']);   // железо есть везде — «чужим» не бывает
+    if(!p) return ex;
+    for(const k of upgradePlanetResourceKeys(p)) ex.add(k);   // склад/жилы планеты
+    for(const k of armThemeResourceKeys(p)) ex.add(k);        // тема рукава
+    return ex;
+}
+// Относительная «весовая» стоимость ресурсов: замена лестничного ресурса на
+// другой не должна требовать 450 🌑 вместо 150 🔩.
+const FOREIGN_AMOUNT_FACTOR = { carbon:1.0, kriogen:0.8, silicon:0.65, titanium:0.40, uranium:0.16, darkMatter:0.03 };
+// Детерминированный выбор «чужого»: стабилен для пары планета+уровень
+// (цена не «прыгает» между перерисовками и сохраняется смысл маршрутов).
+function pickForeignUpgradeResource(p, lvl, excluded, baseAmount){
+    const cands = [];
+    for(const k in RESOURCES){
+        const r = RESOURCES[k];
+        if(!r || r.hidden || r.legacy) continue;
+        if(excluded.has(k)) continue;
+        if(!isResourceUnlocked(k)) continue;
+        if(!resourceAvailableInGalaxy(k)) continue;
+        cands.push(k);
+    }
+    if(!cands.length) return null;
+    cands.sort();
+    const seedStr = ((p && p.id) || 'world') + ':' + (Number(lvl)||0);
+    let h = 2166136261;
+    for(let i=0;i<seedStr.length;i++){ h ^= seedStr.charCodeAt(i); h = Math.imul(h, 16777619); }
+    const key = cands[Math.abs(h) % cands.length];
+    const f = (FOREIGN_AMOUNT_FACTOR[key] != null) ? FOREIGN_AMOUNT_FACTOR[key] : 0.5;
+    return { key, amount: Math.max(1, Math.round(baseAmount * f)) };
+}
+// Какой «чужой» ресурс нужен для апгрейда с уровня lvl на планете p.
+function crossPlanetUpgradeResource(lvl, p){
     if(lvl < 10) return null;
-    const idx = Math.min(CROSS_PLANET_UPGRADE_LADDER.length - 1, lvl);
-    const entry = CROSS_PLANET_UPGRADE_LADDER[idx];
+    if(!p) p = activePlanet;
+    const LAST = CROSS_PLANET_UPGRADE_LADDER.length - 1;
+    const entry = CROSS_PLANET_UPGRADE_LADDER[Math.min(LAST, lvl)];
     if(!entry) return null;
-    let key = entry.key, amount = entry.amount;
+    let amount = entry.amount;
+    if(lvl > LAST) amount = Math.ceil(amount * Math.pow(1.22, lvl - LAST));   // V0.0.3.2 (п.4) — рост после 19 ур.
+    const excluded = foreignResourceExclusions(p);
+    // 1) лестничный ресурс подходит: чужой И доступен в галактике
+    let key = entry.key;
+    if(key && key !== 'iron' && !excluded.has(key) && isResourceUnlocked(key) && resourceAvailableInGalaxy(key)){
+        return { key, amount };
+    }
+    // 2) любой чужой доступный ресурс (детерминированный выбор)
+    const alt = pickForeignUpgradeResource(p, lvl, excluded, amount);
+    if(alt) return alt;
+    // 3) чужих в галактике ещё нет (ранняя игра): прежний откат по цепочке
+    //    простоты с ×0.6 количества — прогрессия не должна блокироваться.
+    key = entry.key;
     while(key && key !== 'iron'){
-        if(isResourceUnlocked(key) && resourceAvailableInGalaxy(key)) break;
+        if(!excluded.has(key) && isResourceUnlocked(key) && resourceAvailableInGalaxy(key)) break;
         key = CROSS_PLANET_FALLBACK[key] || null;
         amount = Math.ceil(amount * 0.6);
     }
-    if(!key || key === 'iron') return null;
+    if(!key || key === 'iron' || excluded.has(key)) return null;
     return { key, amount };
 }
 
@@ -8207,6 +8466,23 @@ function planetCrossCostMult(idx){
     return 1 + (i - 3) * 0.10;   // P4 ×1.10 · P10 ×1.70 · P20 ×2.70
 }
 
+// ============================================================
+// V0.0.3.2 — ФИКС (п.4 пользователя): СТОИМОСТЬ ЗАМИРАЛА С 19 УРОВНЯ.
+// В SIMPLE/RESOURCE_UPGRADE_LADDER всего 20 строк (переходы 0→1 … 19→20),
+// а MAX_LEVEL технологиями «Мастерство клеток» поднимается до 120:
+// Math.min(lvl, len-1) намертво фиксировал цену на последней строке.
+// Теперь таблица продолжается экспонентой ×1.28/уровень — ровно тот темп,
+// которым она заканчивается (e: 146000→185000 ≈ ×1.27; a: 10000→12800 = ×1.28).
+// ============================================================
+const UPGRADE_LADDER_CONT_GROWTH = 1.28;
+function upgradeLadderRow(ladder, lvl){
+    const l = Math.max(0, Number(lvl)||0);
+    const last = ladder.length - 1;
+    if(l <= last) return ladder[l];
+    const base = ladder[last];
+    const m = Math.pow(UPGRADE_LADDER_CONT_GROWTH, l - last);
+    return { e: base.e*m, a: base.a*m, b: base.b*m, g: base.g*m, x: base.x*m };
+}
 function upgradeCost(c,p=activePlanet){
     if(!c||!p) return {energy:0,resources:{}};
     const lvl=Math.max(0,Number(c.level)||0);
@@ -8225,10 +8501,10 @@ function upgradeCost(c,p=activePlanet){
     // V0.0.4.42 — «чужой» ресурс вместо research на высоких уровнях.
     // V0.0.16 — он лежит в cost.global только для отображения (🚚): списывается
     // строго со склада этой планеты (см. canAffordUpgradeCost/spendUpgradeCost).
-    const cross = crossPlanetUpgradeResource(lvl);
+    const cross = crossPlanetUpgradeResource(lvl, p);   // V0.0.3.2 (п.5) — «чужой» относительно планеты И рукава
 
     if(c.type===0){
-        const table=SIMPLE_UPGRADE_LADDER[Math.min(lvl,SIMPLE_UPGRADE_LADDER.length-1)];
+        const table=upgradeLadderRow(SIMPLE_UPGRADE_LADDER, lvl);   // V0.0.3.2 (п.4) — рост продолжается после 19 ур.
         add(primary,table.a*pm*tm*pcm);
         if(table.b && secondary) add(secondary,table.b*pm*pcm);
         const global={};
@@ -8240,7 +8516,7 @@ function upgradeCost(c,p=activePlanet){
     if(c.type===3 || c.type===5){
         const minePrimary=c.type===5?'kriogen':(c.resourceKey||'iron');
         const mineSecondary=secondaryResourceKey(p,minePrimary);
-        const table=RESOURCE_UPGRADE_LADDER[Math.min(lvl,RESOURCE_UPGRADE_LADDER.length-1)];
+        const table=upgradeLadderRow(RESOURCE_UPGRADE_LADDER, lvl);   // V0.0.3.2 (п.4)
         // V0.0.4.38: с 10→11 добавляются глобальные ресурсы.
         // V0.0.4.42: research заменён межпланетным ресурсом (ПАТЧ 2).
         add(minePrimary,table.a*pm*tm*pcm);
@@ -8733,8 +9009,11 @@ function renderPlanetPage(){
         if((p.perks?.kriogenBonus||1)!==1) mods.push(`Криоген ×${p.perks.kriogenBonus.toFixed(2)}`);
         if((p.perks?.scanCostMult||1)!==1) mods.push(`Скан ×${p.perks.scanCostMult.toFixed(2)}`);
         if((p.perks?.upgradeCostMult||1)!==1) mods.push(`Апгрейд ×${p.perks.upgradeCostMult.toFixed(2)}`);
+        if((p.planetIndex||1)>=3 && p.biome!=='hidden') mods.push(`⚠ Дефицит ×${planetDeficitMult(p.planetIndex).toFixed(2)} · истощение ×${planetDeficitDepleteMult(p.planetIndex).toFixed(2)}`);   // V0.0.3.2 (п.3)
 
-        pageHTML = `
+        // V0.0.3.2 — ФИКС (ревью, п.3): «=» затирал панель Хранителя и
+        // «Ресурсы грани», добавленные двумя строками выше. Теперь «+=».
+        pageHTML += `
             <div class="planet-panel-title">${p.isUnique ? '🌟 ' : '🪐 '}${p.name}${p.isUnique ? ' <span style="font-size:11px;color:#ffda47;letter-spacing:1px;">УНИКАЛЬНЫЙ</span>' : ''}</div>
             <div class="planet-panel-sub">${planetShortDescription(p)}</div>
             <button class="menu-action-btn" id="planet-panel-sonar" style="display:${(activePlanetId==='ferrum' && sonarTargetAvailable() && (unlockedPlanets.has('krios') || explored>=total))?'flex':'none'}">
@@ -8767,6 +9046,10 @@ function renderPlanetPage(){
                     hintTxt = `${Math.ceil(b.hp)} / ${b.maxHp} HP · заход ${(b.fails||0)+1}`;
                     btnDisabled = false;
                 }
+                // V0.0.3.2 — панель «Хранитель» (renderGuardianPanel) восстановлена и
+                // сама показывает кнопку боя по формам — дубль активной кнопки убираем
+                // (заблокированные состояния «🔧 разрушено»/«⏳ кулдаун» остаются здесь).
+                if(!btnDisabled && typeof guardianNextForm==='function' && guardianNextForm(p)) return '';
                 return `<button class="menu-action-btn" id="planet-panel-boss" ${btnDisabled?'disabled':''}
                     style="border-color:${btnDisabled?'#5a1c1c':'#ff5e5e'};color:#ff8c8c;margin-top:6px;${btnDisabled?'opacity:.55;':''}">
                     ⚔ ПРОБУДИТЬ ХРАНИТЕЛЯ <span class="sub-text" style="color:#ff8c8c">${hintTxt}</span>
@@ -9157,6 +9440,10 @@ function updateUI(){
             elBadge.textContent = badge;
             elBadge.style.color = (activePlanet.biome==='krios')?'#4ddcff':(activePlanet.biome==='ferrum'?'#d4772e':'#91adbb');
             elBadge.style.textShadow = 'none';
+        }
+        // V0.0.3.2 (п.3) — маркер дефицита в HUD для планет 3+
+        if((activePlanet.planetIndex||1)>=3 && activePlanet.biome!=='hidden' && !String(elBadge.textContent).includes('ДЕФИЦИТ')){
+            elBadge.textContent += ' · ⚠ДЕФИЦИТ';
         }
     }
 
@@ -9845,7 +10132,15 @@ const CELL_TYPE_COLORS = {
 };
 function _hexRGB(hex){
     if(!hex) return [40,80,100];
-    if(hex[0]==='#') return [parseInt(hex.slice(1,3),16),parseInt(hex.slice(3,5),16),parseInt(hex.slice(5,7),16)];
+    if(hex[0]==='#'){
+        let h=hex.slice(1);
+        if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];   // V0.0.3.2 (ревью, п.7) — #abc → #aabbcc
+        if(h.length>=6){
+            const n=parseInt(h.slice(0,6),16);
+            if(Number.isFinite(n)) return [(n>>16)&255,(n>>8)&255,n&255];
+        }
+        return [40,80,100];
+    }
     const m=hex.match(/(\d+)\D+(\d+)\D+(\d+)/);
     return m?[+m[1],+m[2],+m[3]]:[40,80,100];
 }
@@ -9897,6 +10192,114 @@ const CELL_RES_COLORS = (()=>{
     m.darkMatter= '#6a3fa0';
     return m;
 })();
+// ============================================================
+// V0.0.3.3 (правки 3, патч 2) — ПРОТУBERАНЕЦ: оффскрин-атлас
+// «солнечных петель» для клеток в активной фазе «Разряда»
+// (c._chargedAt в пределах CHARGE_CONFIG.baseDur). 12 кадров ×
+// 2 цвета генерируются лениво один раз и кэшируются; drawImage
+// дешевле, чем десятки createRadialGradient каждый кадр.
+// Тюнинг: PROM_SIZE (резкость), PROM_FRAMES (плавность),
+// скорость кадров — performance.now()/70 в draw().
+// ============================================================
+const _promSprites = {};
+const PROM_FRAMES = 12;
+const PROM_SIZE   = 96;
+function getProminenceFrames(colorKey){
+    if(_promSprites[colorKey]) return _promSprites[colorKey];
+    const colHex = (colorKey === 'rare') ? '#c084fc' : '#2dba6e';
+    const colRGB = _hexRGB(colHex);
+    const frames = [];
+    for(let f = 0; f < PROM_FRAMES; f++){
+        const cnv = document.createElement('canvas');
+        cnv.width = cnv.height = PROM_SIZE;
+        const cc  = cnv.getContext('2d');
+        if(!cc){ frames.push(cnv); continue; }   // окружения без 2d-контекста (тесты)
+        const t     = f / PROM_FRAMES;
+        const phase = t * Math.PI * 2;
+        const cx    = PROM_SIZE / 2;
+        const baseY = PROM_SIZE * 0.78;                 // низ спрайта — «поверхность» клетки
+        // 1. Основание: радиальное свечение у поверхности
+        const baseGlow = cc.createRadialGradient(cx, baseY, 0, cx, baseY, PROM_SIZE * 0.32);
+        baseGlow.addColorStop(0,   `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},0.85)`);
+        baseGlow.addColorStop(0.4, `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},0.35)`);
+        baseGlow.addColorStop(1,   `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},0)`);
+        cc.fillStyle = baseGlow;
+        cc.beginPath(); cc.arc(cx, baseY, PROM_SIZE * 0.32, 0, Math.PI * 2); cc.fill();
+        // 2. Петли: три асимметричные дуги, у каждой своя фаза пульса
+        const loops = [
+            { x0: cx - 14, x1: cx - 4,  h: 30, w: 3.2, ph: 0.00 },
+            { x0: cx - 4,  x1: cx + 10, h: 42, w: 4.0, ph: 0.35 },
+            { x0: cx + 4,  x1: cx + 14, h: 26, w: 2.6, ph: 0.70 }
+        ];
+        for(const L of loops){
+            const p     = Math.sin(phase + L.ph * Math.PI * 2);
+            const h     = L.h * (0.75 + 0.25 * p);       // высота «дышит»
+            const mx    = (L.x0 + L.x1) / 2;
+            const ctrlY = baseY - h * 1.35;
+            // 2a. Внешнее свечение — толстая размытая линия
+            cc.beginPath();
+            cc.moveTo(L.x0, baseY);
+            cc.quadraticCurveTo(mx, ctrlY, L.x1, baseY);
+            cc.strokeStyle = `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},${(0.35 + 0.25*p).toFixed(3)})`;
+            cc.lineWidth = L.w * 3.5;
+            cc.lineCap   = 'round';
+            cc.stroke();
+            // 2b. Средний слой
+            cc.strokeStyle = `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},${(0.60 + 0.25*p).toFixed(3)})`;
+            cc.lineWidth = L.w * 1.8;
+            cc.stroke();
+            // 2c. Ядро петли — светлое
+            cc.strokeStyle = `rgba(255,255,255,${(0.70 + 0.25*p).toFixed(3)})`;
+            cc.lineWidth = L.w * 0.7;
+            cc.stroke();
+        }
+        // 3. Искры над петлями (мигают по фазе — не на каждом кадре)
+        for(let i = 0; i < 5; i++){
+            const L2 = loops[i % loops.length];
+            const sp = Math.sin(phase * 2 + i * 1.7);
+            if(sp < 0.30) continue;
+            const ang = (i / 5) * Math.PI - Math.PI / 2;
+            const r   = 6 + 4 * Math.abs(sp);
+            const sx  = (L2.x0 + L2.x1) / 2 + Math.cos(ang) * r;
+            const sy  = baseY - L2.h - 4 + Math.sin(ang) * r * 0.5;
+            const sg  = cc.createRadialGradient(sx, sy, 0, sx, sy, 4);
+            sg.addColorStop(0,   `rgba(255,255,255,${(0.9*Math.abs(sp)).toFixed(3)})`);
+            sg.addColorStop(0.4, `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},${(0.6*Math.abs(sp)).toFixed(3)})`);
+            sg.addColorStop(1,   `rgba(${colRGB[0]},${colRGB[1]},${colRGB[2]},0)`);
+            cc.fillStyle = sg;
+            cc.beginPath(); cc.arc(sx, sy, 4, 0, Math.PI * 2); cc.fill();
+        }
+        frames.push(cnv);
+    }
+    _promSprites[colorKey] = frames;
+    return frames;
+}
+// Прогрев: один раз в конце startGame, чтобы первый показанный протуберанец
+// не «залипал» на генерации 24 offscreen-канвасов (~10–15 мс).
+function warmupProminenceSprites(){
+    try{ getProminenceFrames('rich'); getProminenceFrames('rare'); }catch(e){}
+}
+// V0.0.3.4 — ФИКС «правки 3» патч 2: единый источник правды о том, что
+// рисуется на богатой (type 1) / редкой (type 2) клетке.
+// В 0.0.3.3 ветка протуберанца была вложена в «кулдаун истёк», но кулдаун
+// разряда (cd 45/90 с) всегда длиннее активного окна (baseDur 20/25 с),
+// поэтому «солнечные петли» в реальной игре не рисовались никогда.
+// Порядок по исходному ТЗ: недавно разряжена → 'prominence'; иначе идёт
+// кулдаун → 'cooldown' (кольцо); иначе → 'ready' (пульс «готов к разряду»).
+// Функцию использует и draw(), и __ccDebug.prominenceStateProbe — харнес
+// тестирует реальную логику, а не её копию.
+function cellChargeVisualState(c, nowMs){
+    nowMs = nowMs || Date.now();
+    const cfg = CHARGE_CONFIG[c.type];
+    const activeMs = nowMs - (c._chargedAt || 0);
+    const durMs    = ((cfg && cfg.baseDur) || 20) * 1000;
+    if(c._chargedAt > 0 && activeMs >= 0 && activeMs < durMs){
+        return { state:'prominence', activeMs:activeMs, durMs:durMs, fade:Math.max(0, 1 - activeMs / durMs) };
+    }
+    const leftCD = (c._chargeCooldown || 0) - nowMs;
+    if(leftCD > 0) return { state:'cooldown', leftCD:leftCD };
+    return { state:'ready' };
+}
 function cellFillColor(c, explored, palette){
     if(!explored){
         if(c.type===3)  return dimColor(CELL_RES_COLORS[c.resourceKey||'iron'], 0.68);
@@ -10239,10 +10642,28 @@ function draw(){
                         ctx.stroke();
                         ctx.restore();
                     } else {
-                        const leftCD = (c._chargeCooldown||0) - Date.now();
-                        if(leftCD > 0){
+                        // V0.0.3.4 — ФИКС «правки 3» патч 2: ПРОТУБЕРАНЕЦ — ПРИОРИТЕТНАЯ
+                        // ветка. В 0.0.3.3 она стояла за условием «кулдаун истёк» и никогда
+                        // не срабатывала (cd 45/90 с > активного окна 20/25 с). Порядок по
+                        // ТЗ: недавно разряжена → петли; иначе кулдаун → кольцо; иначе пульс.
+                        const vis = cellChargeVisualState(c, Date.now());
+                        if(vis.state === 'prominence'){
+                            const frames = getProminenceFrames(c.type === 2 ? 'rare' : 'rich');
+                            const frame  = frames[Math.floor(performance.now() / 70) % frames.length];
+                            const cellR  = Math.max(12, radC * 1.9 * Math.min(zoom, 2));
+                            const drawW  = cellR * 2, drawH = cellR * 2;
+                            const drawX  = centXC - drawW / 2;
+                            // База спрайта (0.78 высоты) — чуть ниже центра клетки:
+                            // петли «выходят» из её поверхности.
+                            const drawY  = centYC - drawH * 0.78 + radC * 0.25;
+                            ctx.save();
+                            ctx.globalCompositeOperation = 'lighter';
+                            ctx.globalAlpha = Math.min(1, vis.fade * 1.4) * (0.7 + 0.3 * Math.sin(performance.now() / 220 + c.id));
+                            if(frame) ctx.drawImage(frame, drawX, drawY, drawW, drawH);
+                            ctx.restore();
+                        } else if(vis.state === 'cooldown'){
                             const cfgCD = CHARGE_CONFIG[c.type];
-                            const ratio = Math.max(0, Math.min(1, 1 - leftCD/(cfgCD.cd*1000)));
+                            const ratio = Math.max(0, Math.min(1, 1 - vis.leftCD/(cfgCD.cd*1000)));
                             ctx.save();
                             ctx.beginPath(); ctx.arc(centXC,centYC,radC*0.82,0,Math.PI*2);
                             ctx.strokeStyle='rgba(0,0,0,.5)'; ctx.lineWidth=Math.max(1.5,2*zoom); ctx.stroke();
@@ -10250,14 +10671,12 @@ function draw(){
                             ctx.strokeStyle='#ffda47'; ctx.lineWidth=Math.max(1.5,2*zoom); ctx.stroke();
                             ctx.restore();
                         } else {
-                            // V0.0.16.1 — FIX (баг №3): ореол «готов к Разряду» у ЛЮБОЙ
-                            // богатой/редкой клетки вне кулдауна (раньше только _chargedEver —
-                            // свежее месторождение не приглашало тапать). _chargedEver остаётся Летописи.
-                            const plG = 0.26+0.2*Math.sin(performance.now()/600 + c.id);
+                            // Пульс «готов к Разряду» (V0.0.16.1, баг №3): клетка не должна выглядеть мёртвой.
+                            const plG = 0.26 + 0.2 * Math.sin(performance.now() / 600 + c.id);
                             ctx.save();
-                            ctx.globalCompositeOperation='lighter';
-                            ctx.strokeStyle = c.type===2 ? 'rgba(192,132,252,'+plG.toFixed(3)+')' : 'rgba(45,186,110,'+plG.toFixed(3)+')';
-                            ctx.lineWidth=Math.max(1.5,2*zoom);
+                            ctx.globalCompositeOperation = 'lighter';
+                            ctx.strokeStyle = c.type === 2 ? 'rgba(192,132,252,' + plG.toFixed(3) + ')' : 'rgba(45,186,110,' + plG.toFixed(3) + ')';
+                            ctx.lineWidth = Math.max(1.5, 2 * zoom);
                             ctx.stroke();
                             ctx.restore();
                         }
@@ -10953,9 +11372,9 @@ function watchMilestones(){
     }
 }
 
-function gameLoop(now){
+function gameLoopBody(now){   // V0.0.3.2 — тело вынесено; обёртка ниже держит цикл живым
     if(!started){return;}
-    if(document.hidden){ lastTime=now; requestAnimationFrame(gameLoop); return; }
+    if(document.hidden){ lastTime=now; return; }   // V0.0.3.2 — rAF делает обёртка
     lastTick=Date.now();
     let dt=(now-lastTime)/1000;lastTime=now;
     if(dt>0.5) dt=0.5;
@@ -10998,8 +11417,7 @@ function gameLoop(now){
             }
         }
         draw();
-        requestAnimationFrame(gameLoop);
-        return;
+        return;   // V0.0.3.2 — rAF делает обёртка
     }
 
     watchMilestones();
@@ -11314,6 +11732,29 @@ function gameLoop(now){
         dispatcherTick(now);      // V0.0.5 — диспетчерский пункт
         updateMetaUI();
         tickTransportUI();
+    }
+}
+
+// ============================================================
+// V0.0.3.2 — ЖИВУЧЕСТЬ ЦИКЛА (ревью, п.6): любая ошибка тиковой логики
+// (рендер, ачивки, события, транспорт) раньше обрывала requestAnimationFrame —
+// игра «умирала» без сообщения: планета переставала вращаться и отвечать
+// на тапы. Теперь тело обёрнуто: ошибка троттлится в консоль и в заголовок
+// вкладки (ERR: …), а цикл ГАРАНТИРОВАННО продолжается.
+// ============================================================
+let _loopErrLast = 0, _loopErrCount = 0;
+function gameLoop(now){
+    if(!started) return;
+    try{
+        gameLoopBody(now);
+    }catch(e){
+        const t = Date.now();
+        if(t - _loopErrLast > 2000){
+            _loopErrLast = t; _loopErrCount++;
+            try{ console.error('[gameLoop] ошибка тика #' + _loopErrCount + ':', e); }catch(_){}
+            try{ document.title = 'ERR: ' + ((e && e.message) || e); }catch(_){}
+        }
+        lastTime = now;
     }
     requestAnimationFrame(gameLoop);
 }
@@ -12731,7 +13172,7 @@ function getCellDepletionRateBase(c,p){
     if(!(baseYield>0)) return 0;
     const mult = c.isDeep ? techHyperDrill() : 1;
     const sec = sectorOf(p.id) || {};
-    const depleteMult = Number(sec.deplete)||1;
+    const depleteMult = (Number(sec.deplete)||1) * (p.biome==='hidden' ? 1 : planetDeficitDepleteMult(p.planetIndex));   // V0.0.3.2 (п.3) — ускоренное истощение P3+
     const planetDeplete = Number(p.perks&&p.perks.depletionMult)||1;
     const levelDeplete = cellLevelDepletionMult(c);
     return baseYield * mult * planetDeplete * techThermMult() * depleteMult * levelDeplete * planetPowerDepletionMult(p) * perkDepletionMult();   // V0.0.4.41 — Волна 2: Питание; V0.0.4.42 — «Стабилизаторы»
@@ -12752,7 +13193,7 @@ function grantOffline(elapsed){
     const p=PLANETS[pid];
     if(!p) return;
 
-    const pm=offlineMultForPlanet(p);
+    const pm=offlineMultForPlanet(p) * (p.biome==='hidden' ? 1 : planetDeficitMult(p.planetIndex));   // V0.0.3.2 — дефицит действует и офлайн
     const crystalMult=1+(tech.crystalBoost*0.5);
     const ironMult=techIronMult()*perkIronMult();
     const kriogenMult=techKriogenMult();
@@ -14912,7 +15353,7 @@ const ACHIEVEMENTS = [
         const seen = new Set();
         for(const pid in PLANETS){ const r = roleOf(pid); if(r) seen.add(r); }
         return seen.size;
-    }, target:5, bonus:{all:0.08} },
+    }, target:3, bonus:{all:0.08} },   // V0.0.3.2 — ФИКС (ревью, п.4): с V0.0.19 призваний 3, а не 5 — ачивка была недостижима
     { id:'role_change',cat:'role',icon:'🔄', name:'Перестройка',       desc:'Сменить роль планеты 3 раза',  goal:()=>gameSession.roleChanges, target:3, bonus:{all:0.03} },
 
     // ---- PLANET · Планеты ----
@@ -14972,11 +15413,11 @@ const ACHIEVEMENTS = [
         const h = new Date().getHours();
         return (h>=3 && h<5) ? 1 : 0;
     }, target:1, bonus:{all:0.05} },
-    { id:'sec_all_roles',cat:'secret',icon:'🎭', name:'Полимат',        desc:'Иметь 5 планет с 5 разными ролями одновременно', secret:true, goal:()=>{
+    { id:'sec_all_roles',cat:'secret',icon:'🎭', name:'Полимат',        desc:'Иметь планеты всех трёх призваний одновременно', secret:true, goal:()=>{   // V0.0.3.2 — 3 призвания с V0.0.19
         const seen = new Set();
         for(const pid in PLANETS){ const r = roleOf(pid); if(r) seen.add(r); }
         return seen.size;
-    }, target:5, bonus:{all:0.15} },
+    }, target:3, bonus:{all:0.15} },   // V0.0.3.2 — ФИКС (ревью, п.4)
     { id:'sec_no_scan', cat:'secret', icon:'🤐', name:'Аскет',          desc:'Совершить престиж, не отсканировав за цикл ни одной новой клетки', secret:true, goal:()=>{
         return (totalPrestiges>0 && gameSession && gameSession.scanned===0) ? 1 : 0;
     }, target:1, bonus:{all:0.10} },
@@ -15331,6 +15772,59 @@ document.getElementById('action-settings')?.addEventListener('click',()=>{
     renderSettingsUI();
     openModal(settingsModal);
 });
+
+// ============================================================
+// V0.0.3.2 (п.2 пользователя) — ПОЛНОЭКРАННЫЙ РЕЖИМ
+// ⛶ на левой FAB-панели: вход в fullscreen; повторное нажатие
+// (или Esc — штатно браузером) — возврат. Вендорные префиксы для
+// старых Safari/Edge. iPhone/iPad не имеют element-fullscreen API —
+// показываем подсказку «На экран Домой».
+// ============================================================
+function ccFullscreenElement(){
+    return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || null;
+}
+function ccUpdateFullscreenUI(){
+    const on = !!ccFullscreenElement();
+    const ic = document.getElementById('fab-fullscreen-icon');
+    if(ic) ic.textContent = on ? '✖' : '⛶';
+    const btn = document.getElementById('fab-fullscreen');
+    if(btn){
+        btn.classList.toggle('fs-on', on);
+        btn.setAttribute('aria-label', on ? 'Выйти из полноэкранного режима' : 'Полноэкранный режим');
+        btn.title = on ? 'Выйти из полноэкранного режима (Esc)' : 'Полноэкранный режим';
+    }
+    return on;
+}
+function ccToggleFullscreen(){
+    try{
+        if(ccFullscreenElement()){
+            const exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen;
+            if(exit){ exit.call(document); ccUpdateFullscreenUI(); return true; }
+            return false;
+        }
+        const el = document.documentElement;
+        const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+        if(req){
+            const pr = req.call(el);
+            if(pr && typeof pr.catch === 'function') pr.catch(err=>{
+                try{ showToast('⛶ Браузер отклонил полноэкранный режим','',3500); }catch(e){}
+                console.warn('[fullscreen]', err);
+            });
+            ccUpdateFullscreenUI();
+            return true;
+        }
+        showToast('⛶ Полноэкранный режим не поддерживается этим браузером.<br>iPhone/iPad: «Поделиться → На экран Домой» — игра будет открываться без адресной строки.','',6000);
+        return false;
+    }catch(e){ console.warn('[fullscreen]', e); return false; }
+}
+['fullscreenchange','webkitfullscreenchange','mozfullscreenchange','msfullscreenchange'].forEach(ev=>{
+    document.addEventListener(ev, ccUpdateFullscreenUI);
+});
+document.getElementById('fab-fullscreen')?.addEventListener('click', ()=>{
+    try{ SFX.click && SFX.click(); }catch(e){}
+    ccToggleFullscreen();
+});
+window.ccToggleFullscreen = ccToggleFullscreen;
 
 function bindToggle(id, key, onChange){
     const el = document.getElementById(id);
@@ -17569,6 +18063,21 @@ const BOSS_PUNISH_BASE_CELLS = 3;
 const BOSS_PUNISH_MAX_CELLS  = 8;
 const BOSS_PUNISH_RESTORE_MS = 15 * 60 * 1000;   // 15 минут
 const BOSS_PUNISH_COST_MULT  = 6;                // ускоренная реставрация ×6
+// V0.0.3.3 — ХОТФИКС: computeRestoreCost была утеряна при переходе v0.0.16.2 →
+// v0.0.17 (вырезана вместе со старым ритм-боем), но вызывается в bossPunishCell,
+// bossPunishPlayer-реставрации и UI разрушенных клеток (10 мест) — любое
+// наказание Хранителя (срыв фазы/поражение/отражение Владыки) падало с
+// ReferenceError и обрывало боевой цикл. Восстановлена из v0.0.16.2 дословно.
+function computeRestoreCost(c){
+    // Базовая цена зависит от типа и уровня; ×BOSS_PUNISH_COST_MULT за срочность
+    const lvl = (c && c.level) || 0;
+    let energyBase = 300 + lvl * 120;
+    if(c && (c.type === 3 || c.type === 5)) energyBase += 200 + lvl * 100;
+    if(c && c.type === 4) energyBase += 800 + lvl * 300;
+    const energyCost = Math.round(energyBase * BOSS_PUNISH_COST_MULT);
+    const crystalCost = (c && (c.type === 4 || (c.level||0) >= 10)) ? 2 + Math.floor(lvl/5) : 0;
+    return { energy: energyCost, crystals: crystalCost };
+}
 
 // ============================================================
 // V0.0.7 — ХРАНИТЕЛЬ: сложность растёт с индексом планеты (План 13).
@@ -17733,6 +18242,7 @@ function startBossFight(pid, form){
                   phaseStartedAt:Date.now(), lastAttackAt:0, lastRegenAt:Date.now(),
                   slips:0, totalDamage:0, ended:false, regenMult:1 };
     ensureGuardian(p).activeForm = form.id;
+    bfVisualReset(form.id);   // V0.0.3.3 — сущность Хранителя на canvas
     renderBossFightUI();
     openModal(bossModal);
     requestAnimationFrame(bossFightLoop);
@@ -17756,6 +18266,7 @@ function bossAttack(resKey){
     if(!bossSpend(resKey, cost)) return;
     s.hpPhase[s.phase] -= 1;
     s.totalDamage += 1;
+    bfVisualHit();   // V0.0.3.3 — вспышка и искры по сущности
     s.lastAttackAt = now;
     try{ SFX.click && SFX.click(); }catch(e){}
     try{ vibrate(8); }catch(e){}
@@ -17765,6 +18276,7 @@ function bossAttack(resKey){
         if(s.phase >= BOSS_PHASES.length){ bossFightEnd('win'); return; }
         try{ spawnFloatingText(W/2, H/2, `🛡 ФАЗА ${s.phase} ПРОБИТА`, '#ffda47'); }catch(e){}
         try{ addShake(15); }catch(e){}
+        bfVisualPhaseBreak();   // V0.0.3.3 — золотая волна + осыпь осколков слоя
     }
     renderBossFightUI();
 }
@@ -17781,6 +18293,7 @@ function bossFightLoop(){
     if(now - s.phaseStartedAt >= BOSS_PHASE_TIMEOUT){
         const p = PLANETS[s.pid];
         s.slips++;
+        bfVisualSlip();   // V0.0.3.3 — красная волна: Хранитель отразил атаку
         bossPunishCell(p, 1);                                  // Хранитель уничтожает клетку
         s.regenMult = 2;                                       // удвоенная регенерация до конца боя
         s.hpPhase[s.phase] = s.hpMax;
@@ -17895,28 +18408,384 @@ function failOverlord(p){
         try{ showToast('⚠ <b>Владыка отразил атаку.</b><br><span style="font-size:11px;">Провалов: '+g.overlordFails+'/3. Следующий заход через 3 часа.</span>','danger',6000); }catch(e){}
     }
 }
+// ============================================================
+// V0.0.3.3 — SVG-ПОРТРЕТ ХРАНИТЕЛЯ для панели планеты и вкладки
+// «Активность → Хранитель» (вместо голого текста): силуэт формы,
+// дуга прогресса (исследование/кулдаун), статусная анимация.
+// mode: 'ready' — пульсирует цветным; 'locked' — серый, дуга = доля
+//   исследования до порога; 'cooldown' — серый, дуга = остаток
+//   кулдауна Владыки; 'defeated' — трещины + зелёная дуга + ✓.
+// ============================================================
+const GV_PAL = {
+    sentinel: { main:'#7fd4ff', bright:'#e8f7ff', dim:'#3a4455' },
+    guardian: { main:'#ff5e5e', bright:'#ffd7a0', dim:'#54363c' },
+    overlord: { main:'#c084fc', bright:'#ffd76a', dim:'#453a63' }
+};
+function guardianFormSVG(formId, mode, frac){
+    const pal = GV_PAL[formId] || GV_PAL.guardian;
+    const dim = (mode !== 'ready');
+    const c   = dim ? pal.dim : pal.main;          // основной цвет линий
+    const cb  = dim ? '#5a6478' : pal.bright;      // яркий (глаза/ядро)
+    const f   = Math.max(0, Math.min(1, Number(frac) || 0));
+    const C   = 2 * Math.PI * 52;                  // длина дуги прогресса (r=52)
+    const arcCol = mode==='defeated' ? '#73c76b' : (dim ? '#6b7788' : pal.main);
+    let body = '';
+    if(formId === 'sentinel'){
+        const hexPts = (r) => { const pts=[]; for(let k=0;k<6;k++){ const a=(-90+k*60)*Math.PI/180; pts.push((60+Math.cos(a)*r).toFixed(1)+','+(60+Math.sin(a)*r).toFixed(1)); } return pts.join(' '); };
+        body = `<polygon points="${hexPts(27)}" fill="rgba(10,25,40,.85)" stroke="${c}" stroke-width="2.4"/>`
+             + `<polygon points="${hexPts(17)}" fill="none" stroke="${c}" stroke-width="1.1" opacity=".7"/>`
+             + `<rect x="24" y="55" width="9" height="10" rx="2" fill="none" stroke="${c}" stroke-width="1.6"/>`
+             + `<rect x="87" y="55" width="9" height="10" rx="2" fill="none" stroke="${c}" stroke-width="1.6"/>`
+             + `<ellipse class="${dim?'':'gv-eye'}" cx="60" cy="60" rx="3.6" ry="9" fill="${cb}"/>`;
+    } else if(formId === 'overlord'){
+        body = `<g class="${dim?'':'gv-orbit'}"><ellipse cx="60" cy="60" rx="36" ry="10" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="7 5" transform="rotate(-18 60 60)"/></g>`
+             + `<circle cx="60" cy="60" r="21" fill="#0a0514" stroke="${c}" stroke-width="2.2"/>`
+             + `<circle class="${dim?'':'gv-eye'}" cx="60" cy="52" r="2.7" fill="${cb}"/>`
+             + `<circle class="${dim?'':'gv-eye'}" cx="52" cy="65" r="2.4" fill="${cb}" style="animation-delay:.5s"/>`
+             + `<circle class="${dim?'':'gv-eye'}" cx="68" cy="65" r="2.4" fill="${cb}" style="animation-delay:1s"/>`;
+    } else {
+        body = `<polygon points="60,28 82,58 74,94 46,94 38,58" fill="rgba(40,12,18,.85)" stroke="${c}" stroke-width="2.4"/>`
+             + `<polygon points="38,58 26,48 36,68" fill="none" stroke="${c}" stroke-width="1.8"/>`
+             + `<polygon points="82,58 94,48 84,68" fill="none" stroke="${c}" stroke-width="1.8"/>`
+             + `<circle class="${dim?'':'gv-eye'}" cx="60" cy="58" r="6.5" fill="${cb}"/>`
+             + `<path d="M52 76 L60 84 L68 76 M60 84 L60 92" fill="none" stroke="${c}" stroke-width="1.4"/>`;
+    }
+    const cracks = mode==='defeated'
+        ? `<polyline points="44,40 54,54 48,62 60,74 54,86" fill="none" stroke="#9aa5b8" stroke-width="1.6" opacity=".75"/>`
+        + `<polyline points="78,44 68,56 74,66 64,80" fill="none" stroke="#9aa5b8" stroke-width="1.4" opacity=".55"/>`
+        : '';
+    const check = mode==='defeated' ? `<text x="90" y="98" font-size="20" fill="#73c76b" text-anchor="middle">✓</text>` : '';
+    return `<div class="gv-art${mode==='ready'?' gv-ready':''}" style="--gv:${pal.main};">`
+         + `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="guardian-${formId}">`
+         + `<circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="4"/>`
+         + `<circle cx="60" cy="60" r="52" fill="none" stroke="${arcCol}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${(f*C).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 60 60)" opacity="${dim?0.55:0.95}"/>`
+         + body + cracks + check + `</svg></div>`;
+}
 function renderGuardianPanel(p){
     if(!p) return '';
     const form = guardianNextForm(p);
     const g = p.guardian || {};
     if(!form){
         if(g.guardianDefeated && (g.overlordNextAt||0) > Date.now()){
-            const left = Math.ceil((g.overlordNextAt - Date.now())/60000);
-            return `<div class="planet-panel-section" style="border-color:#3c1e5c;background:rgba(20,10,35,.20);"><h4 style="color:#7f9aa8;">🌌 ВЛАДЫКА</h4><div class="planet-panel-empty">Следующий визит через ${left} мин. Провалов: ${g.overlordFails||0}/3.</div></div>`;
+            const leftMs = Math.max(0, g.overlordNextAt - Date.now());
+            const left = Math.ceil(leftMs/60000);
+            const cdMs = GUARDIAN_FORMS[2].cooldownMs || 1;
+            const frac = Math.max(0, Math.min(1, leftMs / cdMs));   // V0.0.3.3: дуга тает вместе с кулдауном
+            return `<div class="planet-panel-section" style="border-color:#3c1e5c;background:rgba(20,10,35,.20);"><h4 style="color:#7f9aa8;">🌌 ВЛАДЫКА</h4>`
+                 + `<div class="gv-row">${guardianFormSVG('overlord','cooldown',frac)}`
+                 + `<div class="gv-info"><div class="planet-panel-empty">Следующий визит через ${left} мин. Провалов: ${g.overlordFails||0}/3.</div></div></div></div>`;
         }
         if(g.guardianDefeated){
-            return `<div class="planet-panel-section" style="border-color:#73c76b;background:rgba(20,40,20,.20);"><h4 style="color:#7ee08a;">✓ ХРАНИТЕЛЬ ПОВЕРЖЕН</h4><div class="planet-panel-empty">Планета завершена. Владыка вернётся через 3 часа.</div></div>`;
+            return `<div class="planet-panel-section" style="border-color:#73c76b;background:rgba(20,40,20,.20);"><h4 style="color:#7ee08a;">✓ ХРАНИТЕЛЬ ПОВЕРЖЕН</h4>`
+                 + `<div class="gv-row">${guardianFormSVG('guardian','defeated',1)}`
+                 + `<div class="gv-info"><div class="planet-panel-empty">Планета завершена. Владыка вернётся через 3 часа.</div></div></div></div>`;
         }
         return '';
     }
     const exploredPct = p.cells.length ? Math.round(p.explored.size / p.cells.length * 100) : 0;
     const canFight = form.id==='sentinel' ? exploredPct>=50 : form.id==='guardian' ? exploredPct>=100 : true;
-    return `<div class="planet-panel-section" style="border-color:#ff5e5e;background:rgba(60,10,10,.25);">
-        <h4 style="color:#ff8c8c;">${form.name}</h4>
-        <div class="planet-panel-row"><span>Исследовано</span><b>${exploredPct}%</b></div>
-        <div class="planet-panel-row"><span>HP (оценочно)</span><b>${Math.round(30*(p.planetIndex||1)*form.hpMult*3)}</b></div>
-        <button class="menu-action-btn" id="panel-guardian-fight" ${canFight?'':'disabled'} style="margin-top:6px;border-color:#ff5e5e;color:#ff8c8c;">
+    const need = form.id==='sentinel' ? 50 : 100;   // порог пробуждения
+    const frac = form.id==='overlord' ? 1 : Math.min(1, exploredPct/100);   // V0.0.3.3: дуга = исследование планеты
+    const pal  = GV_PAL[form.id] || GV_PAL.guardian;
+    return `<div class="planet-panel-section" style="border-color:${pal.main};background:rgba(60,10,10,.25);">
+        <h4 style="color:${pal.main};">${form.name}</h4>
+        <div class="gv-row">
+            ${guardianFormSVG(form.id, canFight?'ready':'locked', frac)}
+            <div class="gv-info">
+                <div class="planet-panel-row"><span>Исследовано</span><b>${exploredPct}%</b></div>
+                <div class="planet-panel-row"><span>HP (оценочно)</span><b>${Math.round(30*(p.planetIndex||1)*form.hpMult*3)}</b></div>
+                ${canFight?'':`<div class="gv-need">Спит. Нужно исследовать ${need}%.</div>`}
+            </div>
+        </div>
+        <button class="menu-action-btn" id="panel-guardian-fight" ${canFight?'':'disabled'} style="margin-top:6px;border-color:${pal.main};color:${pal.main};">
         ${form.id==='sentinel'?'⚔ РАЗБУДИТЬ СТРАЖА':form.id==='guardian'?'⚔ ПРОБУДИТЬ ХРАНИТЕЛЯ':'🌌 ВЫЗВАТЬ ВЛАДЫКУ'}</button></div>`;
+}
+// ============================================================
+// V0.0.3.3 — ВИЗУАЛИЗАЦИЯ ХРАНИТЕЛЯ (окно боя): сущность формы
+// на canvas #bf-visual внутри #boss-modal. Три формы — три
+// силуэта; три слоя защиты по фазам (ЩИТ/БРОНЯ/ЯДРО): пробитые
+// гаснут и осыпаются, текущий трескается/тускнеет с потерей HP,
+// предстоящий едва намечен. Удар → вспышка+искры; пробой фазы →
+// золотая волна+осколки; срыв → красная волна. Всё процедурно,
+// кадры дешёвые (вектор); 2× суперсэмпл через setTransform.
+// ============================================================
+const BFV_W = 460, BFV_H = 190;   // логические размеры (атрибуты canvas 920×380)
+const BFV_PAL = {
+    sentinel: { main:'#7fd4ff', bright:'#e8f7ff', glow:'rgba(127,212,255,', name:'🛡 СТРАЖ' },
+    guardian: { main:'#ff5e5e', bright:'#ffd7a0', glow:'rgba(255,94,94,',  name:'⚔ ХРАНИТЕЛЬ' },
+    overlord: { main:'#c084fc', bright:'#ffd76a', glow:'rgba(192,132,252,', name:'🌌 ВЛАДЫКА' }
+};
+let bfvCanvas = null, bfvCtx = null, bfv = null;
+function bfVisualReset(formId){
+    bfv = { formId: BFV_PAL[formId] ? formId : 'guardian', t0: performance.now(),
+            flash:0, shake:0, slip:0, sparks:[], ringT:-1e9, ringColor:'#ffda47', labelSig:'' };
+    try{
+        bfvCanvas = document.getElementById('bf-visual');
+        bfvCtx = bfvCanvas ? bfvCanvas.getContext('2d') : null;
+        if(bfvCtx && bfvCtx.setTransform) bfvCtx.setTransform(2,0,0,2,0,0);   // 2× суперсэмпл
+    }catch(e){ bfvCtx = null; }
+}
+function bfVisualSparks(n, color, power){
+    if(!bfv) return;
+    const cx = BFV_W/2, cy = BFV_H/2 + 6;
+    for(let i=0; i<n && bfv.sparks.length<170; i++){
+        const a = Math.random()*Math.PI*2, v = (0.7+Math.random()*2)*(power||1);
+        bfv.sparks.push({ x:cx+(Math.random()-0.5)*30, y:cy+(Math.random()-0.5)*30,
+                          vx:Math.cos(a)*v, vy:Math.sin(a)*v-0.5,
+                          life:1, dec:0.016+Math.random()*0.03, color:color });
+    }
+}
+function bfVisualHit(){ if(!bfv) return; bfv.flash=Math.min(1.5,bfv.flash+0.9); bfv.shake=Math.min(9,bfv.shake+4.5); bfVisualSparks(9,'#ffd7a0',1); }
+function bfVisualPhaseBreak(){ if(!bfv) return; bfv.flash=1.7; bfv.shake=13; bfv.ringT=performance.now(); bfv.ringColor='#ffda47'; bfVisualSparks(30,'#ffda47',1.8); }
+function bfVisualSlip(){ if(!bfv) return; bfv.slip=1; bfv.shake=Math.min(15,bfv.shake+7); bfv.ringT=performance.now(); bfv.ringColor='#ff5e5e'; bfVisualSparks(14,'#ff8c8c',1.25); }
+function bfVisualTick(s){
+    if(!bfv || !s || s.ended) return;
+    const ctx = bfvCtx;
+    if(!ctx || !ctx.clearRect) return;
+    const now = performance.now(), t = (now - bfv.t0)/1000;
+    const pal = BFV_PAL[bfv.formId] || BFV_PAL.guardian;
+    // Подпись под canvas: форма + фаза (пишем в DOM только при смене)
+    const sig = (s.formId||'') + '|' + s.phase;
+    if(sig !== bfv.labelSig){
+        bfv.labelSig = sig;
+        try{
+            const lbl = document.getElementById('bf-visual-form');
+            if(lbl){
+                const ph = BOSS_PHASES[s.phase] ? BOSS_PHASES[s.phase].name : '';
+                lbl.textContent = pal.name + ' · ' + ph;
+                lbl.style.color = pal.main;
+            }
+        }catch(e){}
+    }
+    // Затухание эффектов
+    bfv.flash = Math.max(0, bfv.flash - 0.07);
+    bfv.slip  = Math.max(0, bfv.slip  - 0.022);
+    bfv.shake = Math.max(0, bfv.shake * 0.86 - 0.04);
+    const hpFrac = Math.max(0, Math.min(1, (s.hpPhase[s.phase]||0) / Math.max(1, s.hpMax)));
+    ctx.clearRect(0,0,BFV_W,BFV_H);
+    ctx.save();
+    if(bfv.shake > 0.2) ctx.translate((Math.random()-0.5)*bfv.shake, (Math.random()-0.5)*bfv.shake);
+    const cx = BFV_W/2, cy = BFV_H/2 + 8 + Math.sin(t*1.5)*4.5;
+    try{
+        bfvScene(ctx,cx,cy,t,pal);
+        bfvLayers(ctx,cx,cy,t,s,hpFrac,pal);
+        bfvEntity(ctx,cx,cy,t,bfv.formId,pal);
+        bfvFx(ctx,cx,cy,now);
+    }catch(e){}
+    ctx.restore();
+}
+function bfvScene(ctx,cx,cy,t,pal){
+    // Подсветка «сцены»: пятно под сущностью + дрейфующая пыль
+    ctx.save();
+    ctx.globalCompositeOperation='lighter';
+    const g=ctx.createRadialGradient(cx,cy+48,4,cx,cy+48,130);
+    g.addColorStop(0,pal.glow+'0.15)'); g.addColorStop(1,pal.glow+'0)');
+    ctx.fillStyle=g;
+    ctx.beginPath(); ctx.ellipse(cx,cy+54,130,26,0,0,Math.PI*2); ctx.fill();
+    ctx.fillStyle=pal.main;
+    for(let i=0;i<16;i++){
+        const a=t*0.24+i*2.399, r=60+((i*37)%90);
+        const x=cx+Math.cos(a)*r, y=cy+26+Math.sin(a*1.3)*32-((t*7+i*13)%64);
+        ctx.globalAlpha=0.08+0.10*Math.abs(Math.sin(t*2+i));
+        ctx.beginPath(); ctx.arc(x,y,1.1,0,Math.PI*2); ctx.fill();
+    }
+    ctx.restore();
+}
+function bfvLayers(ctx,cx,cy,t,s,hpFrac,pal){
+    // Три слоя защиты = три фазы боя (ЩИТ/БРОНЯ/ЯДРО)
+    const R=34, radii=[R+30,R+19,R+8];
+    for(let i=0;i<3;i++){
+        const done=i<s.phase, cur=i===s.phase;
+        ctx.save();
+        ctx.globalCompositeOperation='lighter';
+        if(done){
+            // Пробитый слой: редкие тусклые осколки медленно вращаются
+            ctx.globalAlpha=0.16; ctx.strokeStyle='#6b7788'; ctx.lineWidth=2;
+            const segs=(i===0)?6:8;
+            for(let k=0;k<segs;k++){
+                if(k%2===0) continue;
+                const a0=t*0.2+k*(Math.PI*2/segs);
+                ctx.beginPath(); ctx.arc(cx,cy,radii[i],a0,a0+0.35); ctx.stroke();
+            }
+        } else if(cur){
+            // Текущий слой: яркость/целостность по HP + трещины по мере урона
+            const dmg=1-hpFrac, segs=(i===0)?6:8;
+            const spin=(i===0)? t*0.35 : -t*0.22;
+            for(let k=0;k<segs;k++){
+                const a0=spin+k*(Math.PI*2/segs);
+                ctx.globalAlpha=(0.78-0.48*dmg)*(0.82+0.18*Math.sin(t*3+k));
+                ctx.strokeStyle=pal.main; ctx.lineWidth=(i===0)?3:(i===1?4:2.4);
+                ctx.beginPath(); ctx.arc(cx,cy,radii[i],a0,a0+(Math.PI*2/segs)*0.72); ctx.stroke();
+            }
+            if(dmg>0.34){
+                ctx.globalAlpha=0.55*dmg; ctx.strokeStyle=pal.bright; ctx.lineWidth=1;
+                const nCr=Math.min(7,Math.floor(dmg*7));
+                for(let k=0;k<nCr;k++){
+                    const a=k*2.399+t*0.05, r0=radii[i]-5, r1=radii[i]+5;
+                    ctx.beginPath();
+                    ctx.moveTo(cx+Math.cos(a)*r0,          cy+Math.sin(a)*r0);
+                    ctx.lineTo(cx+Math.cos(a+0.12)*(r0+4), cy+Math.sin(a+0.12)*(r0+4));
+                    ctx.lineTo(cx+Math.cos(a-0.06)*r1,     cy+Math.sin(a-0.06)*r1);
+                    ctx.stroke();
+                }
+            }
+        } else {
+            // Предстоящий слой: едва намечен
+            ctx.globalAlpha=0.18; ctx.strokeStyle=pal.main; ctx.lineWidth=1.4;
+            ctx.beginPath(); ctx.arc(cx,cy,radii[i],0,Math.PI*2); ctx.stroke();
+        }
+        ctx.restore();
+    }
+}
+function bfvEntity(ctx,cx,cy,t,formId,pal){
+    ctx.save();
+    ctx.translate(cx,cy);
+    if(formId==='sentinel'){
+        // ── СТРАЖ: парящий щит-дрон (гекс + глаз-прорезь + пилоны + струя)
+        ctx.rotate(Math.sin(t*0.8)*0.05);
+        const R=30;
+        ctx.beginPath();
+        for(let k=0;k<6;k++){ const a=-Math.PI/2+k*Math.PI/3; const x=Math.cos(a)*R, y=Math.sin(a)*R; if(k) ctx.lineTo(x,y); else ctx.moveTo(x,y); }
+        ctx.closePath();
+        const g=ctx.createLinearGradient(0,-R,0,R); g.addColorStop(0,'#254a66'); g.addColorStop(1,'#0d2233');
+        ctx.fillStyle=g; ctx.fill();
+        ctx.strokeStyle=pal.main; ctx.lineWidth=2.4; ctx.stroke();
+        ctx.beginPath();
+        for(let k=0;k<6;k++){ const a=-Math.PI/2+k*Math.PI/3; const x=Math.cos(a)*R*0.62, y=Math.sin(a)*R*0.62; if(k) ctx.lineTo(x,y); else ctx.moveTo(x,y); }
+        ctx.closePath();
+        ctx.strokeStyle=pal.glow+'0.5)'; ctx.lineWidth=1.2; ctx.stroke();
+        // пилоны
+        ctx.fillStyle='#1a3a52'; ctx.strokeStyle=pal.main; ctx.lineWidth=1.4;
+        ctx.fillRect(-R-11,-5,9,10); ctx.strokeRect(-R-11,-5,9,10);
+        ctx.fillRect(R+2,-5,9,10);   ctx.strokeRect(R+2,-5,9,10);
+        // глаз-прорезь
+        const eg=0.55+0.45*Math.sin(t*2.6);
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        const gg=ctx.createRadialGradient(0,0,0,0,0,13);
+        gg.addColorStop(0,'rgba(255,255,255,'+(0.85*eg).toFixed(3)+')');
+        gg.addColorStop(0.4,pal.glow+(0.5*eg).toFixed(3)+')');
+        gg.addColorStop(1,pal.glow+'0)');
+        ctx.fillStyle=gg; ctx.beginPath(); ctx.ellipse(0,0,5.5,10,0,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+        // реактивная струя снизу
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        const fl=8+3*Math.sin(t*17);
+        const fg=ctx.createLinearGradient(0,R,0,R+fl+8);
+        fg.addColorStop(0,pal.glow+'0.65)'); fg.addColorStop(1,pal.glow+'0)');
+        ctx.fillStyle=fg;
+        ctx.beginPath(); ctx.moveTo(-7,R); ctx.lineTo(7,R); ctx.lineTo(0,R+fl+6); ctx.closePath(); ctx.fill();
+        ctx.restore();
+    } else if(formId==='overlord'){
+        // ── ВЛАДЫКА: сфера + аккреционный диск (задняя/передняя дуги) + три ока + корона
+        ctx.save(); ctx.rotate(-0.32); ctx.globalCompositeOperation='lighter';
+        ctx.strokeStyle=pal.glow+'0.5)'; ctx.lineWidth=3;
+        if(ctx.setLineDash) ctx.setLineDash([9,5]);
+        ctx.lineDashOffset=-t*24;
+        ctx.beginPath(); ctx.ellipse(0,0,46,13,0,Math.PI,Math.PI*2); ctx.stroke();
+        ctx.restore();
+        const g=ctx.createRadialGradient(-8,-10,4,0,0,30);
+        g.addColorStop(0,'#2a1650'); g.addColorStop(0.7,'#0c0618'); g.addColorStop(1,'#050208');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,28,0,Math.PI*2); ctx.fill();
+        ctx.strokeStyle=pal.main; ctx.lineWidth=2; ctx.globalAlpha=0.9; ctx.stroke(); ctx.globalAlpha=1;
+        ctx.save(); ctx.rotate(-0.32); ctx.globalCompositeOperation='lighter';
+        ctx.strokeStyle=pal.glow+'0.8)'; ctx.lineWidth=3;
+        if(ctx.setLineDash) ctx.setLineDash([9,5]);
+        ctx.lineDashOffset=-t*24;
+        ctx.beginPath(); ctx.ellipse(0,0,46,13,0,0,Math.PI); ctx.stroke();
+        ctx.restore();
+        if(ctx.setLineDash) ctx.setLineDash([]);
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        const eyes=[[-9,-6],[9,-6],[0,9]];
+        for(let k=0;k<3;k++){
+            const bl=Math.max(0.15,Math.sin(t*1.7+k*2.1)), e=eyes[k];
+            const gg=ctx.createRadialGradient(e[0],e[1],0,e[0],e[1],7);
+            gg.addColorStop(0,'rgba(255,240,190,'+(0.95*bl).toFixed(3)+')');
+            gg.addColorStop(0.4,'rgba(255,215,106,'+(0.6*bl).toFixed(3)+')');
+            gg.addColorStop(1,'rgba(255,215,106,0)');
+            ctx.fillStyle=gg; ctx.beginPath(); ctx.arc(e[0],e[1],5.5,0,Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        for(let k=0;k<12;k++){
+            const a=t*0.6+k*0.5236, r=32+5*Math.sin(t*2+k*1.7);
+            ctx.globalAlpha=0.22+0.3*Math.abs(Math.sin(t*1.4+k));
+            ctx.fillStyle=(k%2)?pal.main:pal.bright;
+            ctx.beginPath(); ctx.arc(Math.cos(a)*r,Math.sin(a)*r*0.9,1.6,0,Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+    } else {
+        // ── ХРАНИТЕЛЬ: угловатый голем (тело-пентагон, плечевые шипы,
+        //    ядро-глаз, руны, три парящих осколка)
+        ctx.rotate(Math.sin(t*0.7)*0.035);
+        ctx.beginPath();
+        ctx.moveTo(0,-34); ctx.lineTo(22,-8); ctx.lineTo(14,30); ctx.lineTo(-14,30); ctx.lineTo(-22,-8);
+        ctx.closePath();
+        const g=ctx.createLinearGradient(0,-34,0,30);
+        g.addColorStop(0,'#5a1a22'); g.addColorStop(1,'#280c12');
+        ctx.fillStyle=g; ctx.fill();
+        ctx.strokeStyle=pal.main; ctx.lineWidth=2.4; ctx.stroke();
+        ctx.fillStyle='#3a1016';
+        ctx.beginPath(); ctx.moveTo(-22,-8); ctx.lineTo(-35,-17); ctx.lineTo(-24,3); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(22,-8);  ctx.lineTo(35,-17);  ctx.lineTo(24,3);  ctx.closePath(); ctx.fill(); ctx.stroke();
+        const eg=0.6+0.4*Math.sin(t*2.2);
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        const gg=ctx.createRadialGradient(0,-2,0,0,-2,15);
+        gg.addColorStop(0,'rgba(255,255,255,'+(0.9*eg).toFixed(3)+')');
+        gg.addColorStop(0.35,'rgba(255,140,90,'+(0.7*eg).toFixed(3)+')');
+        gg.addColorStop(1,'rgba(255,94,94,0)');
+        ctx.fillStyle=gg; ctx.beginPath(); ctx.arc(0,-2,9+2*eg,0,Math.PI*2); ctx.fill();
+        ctx.restore();
+        ctx.strokeStyle=pal.glow+'0.45)'; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(-8,10); ctx.lineTo(0,18); ctx.lineTo(8,10); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,18); ctx.lineTo(0,27); ctx.stroke();
+        for(let k=0;k<3;k++){
+            const a=t*0.9+k*2.094, x=Math.cos(a)*42, y=Math.sin(a*1.2)*13-6;
+            ctx.save(); ctx.translate(x,y); ctx.rotate(a*2);
+            ctx.globalAlpha=0.75; ctx.fillStyle=pal.main;
+            ctx.beginPath(); ctx.moveTo(0,-4); ctx.lineTo(3,0); ctx.lineTo(0,4); ctx.lineTo(-3,0); ctx.closePath(); ctx.fill();
+            ctx.restore();
+        }
+    }
+    ctx.restore();
+}
+function bfvFx(ctx,cx,cy,now){
+    // Искры ударов/пробоев
+    if(bfv.sparks.length){
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        for(let i=bfv.sparks.length-1;i>=0;i--){
+            const sp=bfv.sparks[i];
+            sp.x+=sp.vx; sp.y+=sp.vy; sp.vy+=0.045; sp.life-=sp.dec;
+            if(sp.life<=0){ bfv.sparks.splice(i,1); continue; }
+            ctx.globalAlpha=Math.max(0,sp.life); ctx.fillStyle=sp.color;
+            ctx.beginPath(); ctx.arc(sp.x,sp.y,1.7*sp.life+0.4,0,Math.PI*2); ctx.fill();
+        }
+        ctx.restore();
+    }
+    // Волна пробоя/срыва
+    const age=now-bfv.ringT;
+    if(age>=0 && age<620){
+        const k=age/620;
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        ctx.globalAlpha=(1-k)*0.85; ctx.strokeStyle=bfv.ringColor; ctx.lineWidth=3.2*(1-k)+0.6;
+        ctx.beginPath(); ctx.arc(cx,cy,16+k*125,0,Math.PI*2); ctx.stroke();
+        ctx.restore();
+    }
+    // Вспышка урона
+    if(bfv.flash>0.01){
+        ctx.save(); ctx.globalCompositeOperation='lighter';
+        ctx.globalAlpha=Math.min(0.7,bfv.flash*0.45); ctx.fillStyle='#fff3dd';
+        ctx.fillRect(0,0,BFV_W,BFV_H);
+        ctx.restore();
+    }
+    // Красная виньетка срыва
+    if(bfv.slip>0.01){
+        ctx.save();
+        ctx.globalAlpha=Math.min(0.5,bfv.slip*0.42);
+        const g=ctx.createRadialGradient(cx,cy,40,cx,cy,270);
+        g.addColorStop(0,'rgba(255,40,40,0)'); g.addColorStop(1,'rgba(255,40,40,0.75)');
+        ctx.fillStyle=g; ctx.fillRect(0,0,BFV_W,BFV_H);
+        ctx.restore();
+    }
 }
 function renderBossFightUI(){
     const phasesEl = document.getElementById('bf-phases');
@@ -17930,6 +18799,7 @@ function renderBossFightUI(){
         return;
     }
     const p = PLANETS[s.pid]; const idx = (p && p.planetIndex) || 1;
+    bfVisualTick(s);   // V0.0.3.3 — сущность Хранителя живёт в #bf-visual (каждый кадр боя)
     // V0.0.3-fix: структура фаз пересоздаётся ТОЛЬКО при смене фазы;
     // цифры и бары обновляются точечно, иначе rAF-кадр сносил DOM между mousedown и mouseup
     const sigP = String(s.phase);
@@ -18530,8 +19400,11 @@ function sectorResSectionHtml(p){
         if(!r.rare || r.hidden) return false;
         return (planetGet(p.id,k)||0) > 0 || planetProducesResource(p.id,k);
     });
-    if(!keys.length) return '';
-    return `<div class="planet-panel-section"><h4>🪨 РЕСУРСЫ ГРАНИ</h4>` + keys.map(k=>{
+    // V0.0.3.2 (п.3) — плашка дефицита для планет 3+
+    const _defOn = (p.planetIndex||1)>=3 && p.biome!=='hidden';
+    const _defLine = _defOn ? `<div class="planet-panel-row" style="border-color:#5a3a1c;background:rgba(255,180,84,.07);"><span style="color:#ffb454;">⚠ ДЕФИЦИТ P${p.planetIndex}</span><b style="color:#ffb454;">выход ×${planetDeficitMult(p.planetIndex).toFixed(2)} · истощение ×${planetDeficitDepleteMult(p.planetIndex).toFixed(2)}</b></div>` : '';
+    if(!keys.length) return _defLine ? `<div class="planet-panel-section"><h4>🪨 РЕСУРСЫ ГРАНИ</h4>${_defLine}</div>` : '';
+    return `<div class="planet-panel-section"><h4>🪨 РЕСУРСЫ ГРАНИ</h4>` + _defLine + keys.map(k=>{
         const r=RESOURCES[k];
         return `<div class="planet-panel-row"><span>${r.icon} ${r.name} <span style="color:#566;font-size:9px;">T${r.tier||'?'}</span></span><b style="color:${r.color}">${fmtBig(planetGet(p.id,k)||0)}</b></div>`;
     }).join('') + `</div>`;
@@ -18824,44 +19697,90 @@ function premiumRejectMsg(){
     if(!info.salt)      return 'В premium/codes.js не задана соль — коды не проверяются. Пересоберите файл в codegen.html.';
     return 'Неверный код';
 }
+// V0.0.3.3 (правки 3, патч 1) — визуальная схема «игра ─ codes.js ─ покупатель»:
+//   • ok   → весь контур зелёный, по линиям бегут искры (SMIL <animate>)
+//   • fail → весь контур серый, движение замерло; причина — в подписи
+function premiumSignalSVG(ok){
+    const c       = ok ? '#5cf2b0' : '#6b7788';
+    const cBright = ok ? '#d6ffec' : '#9aa5b8';
+    const cSoft   = ok ? 'rgba(92,242,176,0.45)' : 'rgba(107,119,136,0.32)';
+    const lineA   = ok ? 0.85 : 0.45;
+    // Четыре бегущие искры — по две на каждый отрезок, вторая пара со сдвигом фазы
+    const sparks = ok ? `
+        <circle r="2.6" fill="${cBright}">
+            <animate attributeName="cx" values="62;156" dur="1.8s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="2.6" fill="${cBright}">
+            <animate attributeName="cx" values="204;298" dur="1.8s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" dur="1.8s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="2.6" fill="${cBright}">
+            <animate attributeName="cx" values="62;156" dur="1.8s" begin="0.9s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" dur="1.8s" begin="0.9s" repeatCount="indefinite"/>
+        </circle>
+        <circle r="2.6" fill="${cBright}">
+            <animate attributeName="cx" values="204;298" dur="1.8s" begin="0.9s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" dur="1.8s" begin="0.9s" repeatCount="indefinite"/>
+        </circle>
+    ` : '';
+    return `<svg class="premium-signal-svg" viewBox="0 0 360 76" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+        <!-- линии сигнала -->
+        <line x1="62"  y1="38" x2="156" y2="38" stroke="${c}" stroke-width="2" stroke-dasharray="4 5" opacity="${lineA}"/>
+        <line x1="204" y1="38" x2="298" y2="38" stroke="${c}" stroke-width="2" stroke-dasharray="4 5" opacity="${lineA}"/>
+        ${sparks}
+        <!-- левая планета (игра) -->
+        <circle cx="40" cy="38" r="15" fill="none" stroke="${c}" stroke-width="2.2"/>
+        <ellipse cx="40" cy="38" rx="22" ry="5" fill="none" stroke="${cSoft}" stroke-width="1.2"/>
+        <circle cx="40" cy="38" r="4.5" fill="${c}" opacity="${ok ? 0.9 : 0.55}"/>
+        <!-- спутник (файл codes.js) -->
+        <rect x="171" y="30" width="18" height="16" rx="3" fill="none" stroke="${c}" stroke-width="2"/>
+        <line x1="164" y1="38" x2="171" y2="38" stroke="${c}" stroke-width="2"/>
+        <line x1="189" y1="38" x2="196" y2="38" stroke="${c}" stroke-width="2"/>
+        <circle cx="180" cy="38" r="2.4" fill="${cBright}"/>
+        <!-- правая планета (покупатель) -->
+        <circle cx="320" cy="38" r="15" fill="none" stroke="${c}" stroke-width="2.2"/>
+        <ellipse cx="320" cy="38" rx="22" ry="5" fill="none" stroke="${cSoft}" stroke-width="1.2"/>
+        <circle cx="320" cy="38" r="4.5" fill="${c}" opacity="${ok ? 0.9 : 0.55}"/>
+    </svg>`;
+}
+// Склонение русских числительных: 1 хэш, 2 хэша, 5 хэшей
+function pluralRu(n, one, few, many){
+    const m10 = n % 10, m100 = n % 100;
+    if(m10 === 1 && m100 !== 11) return one;
+    if(m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+    return many;
+}
 // V0.0.3-hotfix: видимая диагностика базы кодов (единый баннер для настроек и модалки)
+// V0.0.3.3 (патч 1): вместо текста — схема «планета ─ спутник ─ планета» (зелёное/серое)
+// V0.0.3.4 (продакшен): подпись-диагноз под ЗЕЛЁНОЙ схемой убрана —
+// «N SHA-хэшей · premium/codes.js · режим SHA» покупателю не нужна.
+// Подсказки ошибок сохранены: они видны только когда контур не работает.
 function premiumDbBanner(){
     const info = premiumDbInfo();
-    const base = 'font-size:10px;line-height:1.5;padding:7px 9px;border-radius:8px;margin-bottom:8px;text-align:left;';
-    if(!info.loaded){
-        if(!info.notFound){
-            return `<div style="${base}background:#2a0d12;border:1px solid #7a1d28;color:#ff9aa6;">`
-                 + `⚠️ <b>База кодов повреждена.</b> Файл <span style="font-family:monospace">premium/codes.js</span> загрузился, `
-                 + `но не задал <span style="font-family:monospace">window.VORONIA_PREMIUM</span> — синтаксическая ошибка `
-                 + `или файл перезаписан не тем экспортом.<br>`
-                 + `Пересоберите его в <span style="font-family:monospace">premium/codegen.html</span> (кнопка «💾 premium/codes.js») `
-                 + `и обновите страницу (F5).</div>`;
-        }
-        return `<div style="${base}background:#241708;border:1px solid #7a4a12;color:#ffcf7a;">`
-             + `⚠️ <b>База кодов не подключена.</b> Файл <span style="font-family:monospace">premium/codes.js</span> не найден рядом с HTML `
-             + `(резервный <span style="font-family:monospace">codes.js</span> тоже).<br>`
-             + `Скопируйте папку <b>premium</b> из поставки в папку с игрой и обновите страницу (F5). `
-             + `На саму игру это не влияет — отключён только ввод кодов.</div>`;
+    const ok = !!(info.loaded && info.available && info.salt);
+    let title, hint;
+    if(ok){
+        title = 'Контур премиум-кодов активен';
+        hint  = '';
+    } else if(!info.loaded && info.notFound){
+        title = 'Контур премиум-кодов не подключён';
+        hint  = 'Нет файла <code>premium/codes.js</code> — игра работает полностью, ввод кодов отключён.';
+    } else if(info.loaded && !info.available){
+        title = 'База кодов пуста';
+        hint  = 'Файл есть, но в нём 0 хэшей — пересоберите <code>premium/codes.js</code> в codegen.html.';
+    } else if(info.loaded && !info.salt){
+        title = 'Повреждена соль';
+        hint  = 'В <code>codes.js</code> отсутствует <code>salt</code> — пересоберите файл.';
+    } else {
+        title = 'База кодов повреждена';
+        hint  = 'Файл загружен, но не задал <code>window.VORONIA_PREMIUM</code> — синтаксическая ошибка.';
     }
-    if(!info.available){
-        return `<div style="${base}background:#241708;border:1px solid #7a4a12;color:#ffcf7a;">`
-             + `⚠️ База кодов загружена, но <b>пуста</b> (0 хэшей). Файл <span style="font-family:monospace">${info.source}</span> `
-             + `нужно пересобрать в <span style="font-family:monospace">premium/codegen.html</span> (кнопка «💾 premium/codes.js»).</div>`;
-    }
-    let body = `✅ <b>База кодов подключена</b> · ${info.codes} SHA-хэш(ей)`
-             + (info.codesFnv ? ` + ${info.codesFnv} FNV` : '')
-             + `<br><span style="opacity:.78">файл: <span style="font-family:monospace">${info.source}</span> · соль: ${info.salt ? 'задана' : '<b style="color:#ff8f8f">НЕТ</b>'}${info.verifyUrl ? ' · серверная проверка: вкл' : ''}</span>`;
-    const proto = (typeof location!=='undefined')
-        ? (location.protocol === 'file:' ? 'file://' : location.protocol + '//' + (location.host || 'localhost'))
-        : '?';
-    body += `<br><span style="opacity:.7">SHA-256: ${info.shaMode === 'webcrypto'
-        ? 'Web Crypto'
-        : 'встроенная реализация (Web Crypto недоступен в этом режиме)'} · запуск: ${proto} — действует вся база кодов.</span>`;
-    if(!info.codes && info.codesFnv){
-        body += `<br><span style="color:#ffcf7a">⚠️ В базе только FNV-хэши (${info.codesFnv}) и нет SHA-хэшей: `
-              + `пересоберите <span style="font-family:monospace">premium/codes.js</span> в codegen.html.</span>`;
-    }
-    return `<div style="${base}background:#08201a;border:1px solid #1d5c3f;color:#8ef0c0;">${body}</div>`;
+    return `<div class="premium-signal ${ok ? 'ok' : 'fail'}">
+        ${premiumSignalSVG(ok)}
+        <div class="premium-signal-title">${title}</div>
+        ${hint ? `<div class="premium-signal-hint">${hint}</div>` : ''}
+    </div>`;
 }
 function renderPremiumDbStatus(){
     const el = document.getElementById('premium-db-status');
@@ -19379,6 +20298,7 @@ function startGame(){
         // V0.0.2 — но не поверх офлайн-модалки (openModal их прячет, а startGame
         // раньше включал их обратно безусловно)
         setGameUtilityButtonsVisible(!offlineModalVisible);
+        warmupProminenceSprites();   // V0.0.3.3 (патч 2): пре-рендер 24 offscreen-канвасов атласа протуберанцев
         draw();
         requestAnimationFrame(gameLoop);
         tutorialHint();
@@ -20740,6 +21660,30 @@ window.__ccDebug = {
     bossLive: function(pid){ const p=PLANETS[pid||activePlanetId]; return p? ensureBossState(p) : null; },
     renderPanel: function(){ renderPlanetPanel(); const el=document.getElementById('planet-panel-content'); const html=el?el.innerHTML:''; return { len:html.length, guardDefeated: html.includes('Хранитель повержен'), wakeBtn: html.includes('planet-panel-boss') }; },
     bossFightState: function(){ return bossFight ? Object.assign({}, bossFight) : null; },
+    // V0.0.3.2 — хуки новых проверок: полноэкран / бой-отступление / дефицит / цены 19+ / «чужой» ресурс
+    toggleFullscreen: function(){ return ccToggleFullscreen(); },
+    fullscreenOn: function(){ return !!ccFullscreenElement(); },
+    closeModalsForTest: function(){ closeModals(); return { boss: !!bossFight, sonar: !!SONAR.active }; },
+    deficitFn: function(idx){ const i=Number(idx)||1; return { idx:i, prod:planetDeficitMult(i), deplete:planetDeficitDepleteMult(i) }; },
+    deficitOf: function(pid){ const p=PLANETS[pid||activePlanetId]; return p ? { idx:p.planetIndex||1, hidden:p.biome==='hidden', prod:planetDeficitMult(p.planetIndex), deplete:planetDeficitDepleteMult(p.planetIndex) } : null; },
+    costProbe: function(lvl, type, pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return null; const t=(type==null?0:Number(type)||0); const c={type:t, level:Math.max(0,Number(lvl)||0)}; if(t===3||t===5) c.resourceKey=(p.resourceList&&p.resourceList[0])||'iron'; return upgradeCost(c,p); },
+    ladderRowProbe: function(kind, lvl){ return upgradeLadderRow(kind==='res'?RESOURCE_UPGRADE_LADDER:SIMPLE_UPGRADE_LADDER, Math.max(0,Number(lvl)||0)); },
+    foreignCross: function(lvl, pid){ const p=PLANETS[pid||activePlanetId]; return crossPlanetUpgradeResource(Math.max(0,Number(lvl)||0), p); },
+    planetKeys: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return null; return { idx:p.planetIndex||1, armId:p.armId||null, local:upgradePlanetResourceKeys(p), arm:[...armThemeResourceKeys(p)], excluded:[...foreignResourceExclusions(p)], resList:(p.resourceList||[]).slice() }; },
+    discoverWorldForTest: function(seed){ GAME.discoverPlanet(seed==null?{}:{seed:seed>>>0}); return latestUnlockedPlanetId(); },
+    loopErrCount: function(){ return _loopErrCount; },
+    // V0.0.3.3 — хуки визуализации Хранителя / протуберанца / премиум-баннера
+    bfVisualState: function(){ return bfv ? { formId:bfv.formId, flash:+bfv.flash.toFixed(2), shake:+bfv.shake.toFixed(2), slip:+bfv.slip.toFixed(2), sparks:bfv.sparks.length, hasCtx:!!bfvCtx } : null; },
+    bfVisualHitForTest: function(){ bfVisualHit(); return true; },
+    bfVisualBreakForTest: function(){ bfVisualPhaseBreak(); return true; },
+    bfVisualSlipForTest: function(){ bfVisualSlip(); return true; },
+    bfSquashForTest: function(){ if(!bossFight) return false; bossFight.hpPhase[bossFight.phase]=1; renderBossFightUI(); return true; },
+    prominenceProbe: function(key){ try{ const f=getProminenceFrames(key||'rich'); return { frames:f.length, size:(f[0]&&f[0].width)||0 }; }catch(e){ return { err:String((e&&e.message)||e) }; } },
+    // V0.0.3.4 — QA: какую ветку визуала draw() выберет для богатой/редкой
+    // клетки: 'prominence' | 'cooldown' | 'ready'. nowMs — «перемотка» времени.
+    prominenceStateProbe: function(id,pid,nowMs){ const p=PLANETS[pid||activePlanetId]; const c=p&&p.cells[Number(id)]; if(!c||(c.type!==1&&c.type!==2)) return null; return cellChargeVisualState(c, nowMs?Number(nowMs):Date.now()); },
+    premiumBannerProbe: function(){ try{ return premiumDbBanner(); }catch(e){ return 'ERR:'+((e&&e.message)||e); } },
+    guardianPanelProbe: function(pid){ const p=PLANETS[pid||activePlanetId]; return p ? renderGuardianPanel(p) : null; },
     forceOverlord: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return false; const g=ensureGuardian(p); g.guardianDefeated=true; g.overlordNextAt=0; return true; },   // V0.0.20: вместо forceTribute
     failOverlordNow: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return false; failOverlord(p); return true; },   // V0.0.20: вместо failTribute
     forceCollapse: function(pid){ const p=PLANETS[pid||activePlanetId]; if(!p) return false; collapsePlanet(p); return true; },
@@ -21488,6 +22432,10 @@ function sonarDraw(){
 
 function sonarLoop(now){
     if(!SONAR.active) return;
+    // V0.0.3.2 (ревью, п.1) — защита от невидимого цикла: модалку мини-игры
+    // могли закрыть в обход «финала» — rAF продолжал крутиться впустую.
+    const _sg = document.getElementById('sonar-game');
+    if(_sg && _sg.style.display !== 'block'){ SONAR.active = false; return; }
     const dt = Math.min(0.05, (now - SONAR.lastFrame)/1000 || 0);
     SONAR.lastFrame = now;
     SONAR.t += dt;
